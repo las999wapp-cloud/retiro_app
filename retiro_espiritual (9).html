@@ -426,16 +426,16 @@ nav.snav{flex:1;padding:8px 10px}
 
   <!-- ══ PAGOS ══════════════════════════════════════════════════ -->
   <div class="pag pc" id="p-pagos">
-    <div class="ph"><h1>Pagos &amp; Cuotas</h1><p>Costo: $20.000 por persona</p></div>
+    <div class="ph"><h1>Pagos &amp; Cuotas</h1><p id="pag-sub">Costo: $20.000 por persona</p></div>
     <div class="g2 mb">
       <div class="card">
         <div class="ch"><div><div class="ct">Resumen financiero</div></div></div>
-        <div class="pr"><span class="prn">Total esperado</span><span class="pra">$560.000</span></div>
-        <div class="pr"><span class="prn">Cobrado</span><span class="pra" style="color:var(--ok)">$427.000</span></div>
-        <div class="pr"><span class="prn">Pendiente</span><span class="pra" style="color:var(--er)">$133.000</span></div>
+        <div class="pr"><span class="prn">Total esperado</span><span class="pra" id="pag-total-esp">$560.000</span></div>
+        <div class="pr"><span class="prn">Cobrado</span><span class="pra" style="color:var(--ok)" id="pag-cobrado">$427.000</span></div>
+        <div class="pr"><span class="prn">Pendiente</span><span class="pra" style="color:var(--er)" id="pag-pendiente">$133.000</span></div>
         <div class="div"></div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:11px;color:var(--t3)">Progreso</span><span style="font-size:11px;font-weight:600">76%</span></div>
-        <div class="pb"><div class="pf pf-ok" style="width:76%"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:11px;color:var(--t3)">Progreso</span><span style="font-size:11px;font-weight:600" id="pag-pct-label">76%</span></div>
+        <div class="pb"><div class="pf pf-ok" id="pag-pf" style="width:76%"></div></div>
       </div>
       <div class="card">
         <div class="ch"><div class="ct">Acciones</div></div>
@@ -454,8 +454,8 @@ nav.snav{flex:1;padding:8px 10px}
     <div class="ph"><h1>Salud &amp; Dietas</h1><p>Información médica confidencial de los participantes</p></div>
     <div class="al ae mb"><span class="al-i">⚠️</span><strong>Información confidencial.</strong>&nbsp;Uso exclusivo del equipo de salud y coordinación. No compartir sin autorización.</div>
     <div class="g2 mb">
-      <div class="card"><div class="ch"><div><div class="ct">💊 Medicamentos</div><div class="cs">7 participantes con medicación</div></div></div><div id="meds-lst"></div></div>
-      <div class="card"><div class="ch"><div><div class="ct">🥗 Dietas especiales</div><div class="cs">5 participantes con restricciones</div></div></div><div id="diet-lst"></div></div>
+      <div class="card"><div class="ch"><div><div class="ct">💊 Medicamentos</div><div class="cs" id="salud-med-cs">7 participantes con medicación</div></div></div><div id="meds-lst"></div></div>
+      <div class="card"><div class="ch"><div><div class="ct">🥗 Dietas especiales</div><div class="cs" id="salud-diet-cs">5 participantes con restricciones</div></div></div><div id="diet-lst"></div></div>
     </div>
     <div class="card"><div class="ch"><div><div class="ct">⚕️ Alergias &amp; condiciones</div></div></div><div id="aler-lst"></div></div>
   </div>
@@ -783,6 +783,19 @@ function verP(nombre){
 const FEC=['25/ago','26/ago','27/ago','28/ago','30/ago','1/sep','2/sep','3/sep']
 function rPagos(){
   const lista=PD()
+  const ret=activoIdx>=0?RETIROS[activoIdx]:null
+  // Actualizar resumen financiero
+  const costoP=ret?ret.costo:0
+  const totalEsp=costoP*lista.length
+  const cobrado=lista.reduce((s,x)=>s+x.abonado,0)
+  const pendiente=totalEsp-cobrado
+  const pct=totalEsp>0?Math.round(cobrado/totalEsp*100):0
+  const eSub=$('pag-sub');if(eSub)eSub.textContent=ret?`Costo: $${costoP.toLocaleString()} por persona`:'Sin retiro activo'
+  const eTE=$('pag-total-esp');if(eTE)eTE.textContent=`$${totalEsp.toLocaleString()}`
+  const eCob=$('pag-cobrado');if(eCob)eCob.textContent=`$${cobrado.toLocaleString()}`
+  const ePen=$('pag-pendiente');if(ePen)ePen.textContent=`$${pendiente.toLocaleString()}`
+  const ePct=$('pag-pct-label');if(ePct)ePct.textContent=`${pct}%`
+  const ePf=$('pag-pf');if(ePf)ePf.style.width=pct+'%'
   if(!lista.length){
     $('pagtb').innerHTML=`<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--t3);font-size:13px">${activoIdx<0?'Sin retiro activo':'Sin participantes aún'}</td></tr>`
     return
@@ -806,6 +819,9 @@ function rSalud(){
   const lista=PD()
   const empty=activoIdx<0?'Sin retiro activo':'Sin participantes registrados aún'
   const wm=lista.filter(p=>p.meds)
+  const eMedCs=$('salud-med-cs');if(eMedCs)eMedCs.textContent=wm.length?`${wm.length} participante${wm.length>1?'s':''} con medicación`:'Sin medicación registrada'
+  const wd2=lista.filter(p=>p.dieta)
+  const eDietCs=$('salud-diet-cs');if(eDietCs)eDietCs.textContent=wd2.length?`${wd2.length} participante${wd2.length>1?'s':''} con restricciones`:'Sin restricciones registradas'
   $('meds-lst').innerHTML=wm.length?wm.map(p=>`<div class="om"><div class="av" style="background:${col(p.nombre)};width:26px;height:26px;font-size:9px">${ini(p.nombre)}</div><div style="flex:1"><div style="font-size:12.5px;font-weight:500">${p.nombre}</div><div style="font-size:11px;color:var(--t3);margin-top:1px">${p.meds}</div></div></div>`).join(''):`<div style="color:var(--t3);font-size:12px;padding:8px 0">${lista.length?'Ningún participante con medicación registrada.':empty}</div>`
   const wd=lista.filter(p=>p.dieta)
   $('diet-lst').innerHTML=wd.length?wd.map(p=>`<div class="om"><div class="av" style="background:${col(p.nombre)};width:26px;height:26px;font-size:9px">${ini(p.nombre)}</div><div style="flex:1"><div style="font-size:12.5px;font-weight:500">${p.nombre}</div><div style="font-size:11px;color:var(--t3);margin-top:1px">${p.dieta}</div></div></div>`).join(''):`<div style="color:var(--t3);font-size:12px;padding:8px 0">${lista.length?'Sin dietas especiales.':empty}</div>`
@@ -827,24 +843,32 @@ function rAloj(){
     return
   }
 
-  const ROOMS=[
-    {n:'Hab. Mujeres A',t:'Solo mujeres',cap:6,ps:['María González','Elena Martínez','Laura Sánchez','Valentina Cruz','Natalia Castro','Patricia Lima']},
-    {n:'Hab. Mujeres B',t:'Solo mujeres',cap:6,ps:['Claudia Jiménez','Beatriz Núñez','Carmen Gómez','Mariana Díaz','Lucía Vargas']},
-    {n:'Hab. Hombres A',t:'Solo hombres',cap:6,ps:['Martín López','Diego Fernández','Roberto García','Fernando Ruiz','Eduardo Flores']},
-    {n:'Hab. Hombres B',t:'Solo hombres',cap:6,ps:['Andrés Morales','Ramón Torres','Hugo Silva','Ignacio Romero','Tomás Ortiz']},
-    {n:'Hab. Líderes',t:'Líderes',cap:4,ps:['José Pérez','Carlos Mendoza']},
-  ]
+  const duermen=lista.filter(x=>x.aloj==='duerme')
+  const soloDia=lista.filter(x=>x.aloj==='dia')
+  const seVan=lista.filter(x=>x.aloj==='antes')
+  const CAP=6
+  const ROOMS=[]
+  for(let i=0;i<duermen.length;i+=CAP){
+    const grupo=duermen.slice(i,i+CAP)
+    const num=ROOMS.length+1
+    ROOMS.push({n:`Habitación ${num}`,t:`${grupo.length} ocupante${grupo.length>1?'s':''}`,cap:CAP,ps:grupo.map(x=>x.nombre)})
+  }
+  if(!ROOMS.length&&!soloDia.length&&!seVan.length){
+    ROOMS.push({n:'Sin asignaciones',t:'Ningún participante con alojamiento asignado',cap:0,ps:[]})
+  }
   $('hab-lst').innerHTML=ROOMS.map(r=>`
     <div style="margin-bottom:11px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
-        <div><div style="font-size:12.5px;font-weight:600;color:var(--tx)">${r.n}</div><div style="font-size:10px;color:var(--t3)">${r.t} · ${r.ps.length}/${r.cap}</div></div>
-        <span class="badge ${r.ps.length<r.cap?'b-ok':'b-wn'}">${r.ps.length<r.cap?r.cap-r.ps.length+' libres':'Completa'}</span>
+        <div><div style="font-size:12.5px;font-weight:600;color:var(--tx)">${r.n}</div><div style="font-size:10px;color:var(--t3)">${r.t} · ${r.ps.length}/${r.cap||'—'}</div></div>
+        ${r.cap?`<span class="badge ${r.ps.length<r.cap?'b-ok':'b-wn'}">${r.ps.length<r.cap?r.cap-r.ps.length+' libres':'Completa'}</span>`:''}
       </div>
       <div style="display:flex;gap:3px;flex-wrap:wrap">
         ${r.ps.map(n=>`<div title="${n}" class="av" style="background:${col(n)};width:24px;height:24px;font-size:8px;cursor:pointer" onclick="verP('${n}')">${ini(n)}</div>`).join('')}
       </div>
       <div style="height:1px;background:var(--bdl);margin-top:9px"></div>
     </div>`).join('')
+  +(soloDia.length?`<div style="margin-bottom:11px"><div style="font-size:12.5px;font-weight:600;color:var(--tx);margin-bottom:5px">☀️ Solo de día (${soloDia.length})</div><div style="display:flex;gap:3px;flex-wrap:wrap">${soloDia.map(x=>`<div title="${x.nombre}" class="av" style="background:${col(x.nombre)};width:24px;height:24px;font-size:8px;cursor:pointer" onclick="verP('${x.nombre}')">${ini(x.nombre)}</div>`).join('')}</div><div style="height:1px;background:var(--bdl);margin-top:9px"></div></div>`:'')
+  +(seVan.length?`<div style="margin-bottom:11px"><div style="font-size:12.5px;font-weight:600;color:var(--tx);margin-bottom:5px">🚌 Se van antes (${seVan.length})</div><div style="display:flex;gap:3px;flex-wrap:wrap">${seVan.map(x=>`<div title="${x.nombre}" class="av" style="background:${col(x.nombre)};width:24px;height:24px;font-size:8px;cursor:pointer" onclick="verP('${x.nombre}')">${ini(x.nombre)}</div>`).join('')}</div></div>`:'')
 }
 
 // ═══ ORGANIGRAMA ══════════════════════════════════════════════════
@@ -1043,6 +1067,7 @@ const RETIROS = [
 
 // ── función central: refresca TODOS los módulos siempre ──────
 function refreshAll(){
+  syncRetiroActivo()
   const p=PD()
   // Stats
   $('s-tot').textContent=p.length
@@ -1054,6 +1079,7 @@ function refreshAll(){
   // Todos los módulos
   rDashboard(); rPart(); rPagos(); rSalud(); rAloj(); rOrg(); rComidas(); rAlertas()
   showProg('vie',$('pt-v'))
+  rRetiros()
   // Badge
   const _u=p.filter(x=>x.meds).length+((p.filter(x=>x.alergias).length)?1:0)
   $('ab').textContent=_u||p.filter(x=>x.pago!=='paid'||x.aloj==='antes').length||0
@@ -1091,7 +1117,7 @@ function rDashboard(){
   const pa=$('dash-pr-par');if(pa)pa.textContent=`⏳ Parciales (${parciales.length})`
   const ma=$('dash-monto-par');if(ma)ma.textContent=`$${parciales.reduce((s,x)=>s+x.abonado,0).toLocaleString()}`
   const pn=$('dash-pr-nop');if(pn)pn.textContent=`❌ Sin abonar (${sinPagar.length})`
-  const mn=$('dash-monto-nop');if(mn)mn.textContent='$0'
+  const mn=$('dash-monto-nop');if(mn)mn.textContent=`$${sinPagar.reduce((s,x)=>s+(x.total-x.abonado),0).toLocaleString()}`
 
   // Alojamiento rápido
   const dd=$('dash-duerme');if(dd)dd.textContent=p.filter(x=>x.aloj==='duerme').length
@@ -1174,7 +1200,7 @@ function rRetiros(){
       <div style="font-size:11px;color:var(--t3);margin-bottom:10px">📍 ${r.l}</div>
       ${r.v?`<div style="font-size:11px;font-style:italic;color:var(--brl);background:var(--cr);padding:7px 10px;border-radius:var(--rx);border-left:3px solid var(--go);margin-bottom:10px">"${r.v}"</div>`:''}
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <span style="font-family:var(--f);font-size:17px;font-weight:600">${r.ins}<span style="font-size:11px;font-weight:400;color:var(--t3);font-family:var(--s)"> participantes</span></span>
+        <span style="font-family:var(--f);font-size:17px;font-weight:600">${(r.participantes||[]).length}<span style="font-size:11px;font-weight:400;color:var(--t3);font-family:var(--s)"> participantes</span></span>
         ${r.costo?`<span style="font-size:11px;color:var(--t3)">$${r.costo.toLocaleString()}/persona</span>`:''}
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
@@ -1299,6 +1325,7 @@ function addPart(){
   const al=$('np-al').value
   const lista=RETIROS[activoIdx].participantes
   lista.push({id:lista.length+1,nombre:n,cel:c,iglesia:'',edad:0,pago:pg,abonado:m,total:RETIROS[activoIdx].costo||20000,aloj:al,meds:'',dieta:'',alergias:'',cond:'',notas:''})
+  RETIROS[activoIdx].ins=lista.length
   closeM('m-np')
   $('np-n').value='';$('np-c').value='';$('np-m').value=''
   refreshAll()
