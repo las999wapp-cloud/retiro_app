@@ -3,1372 +3,1296 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Retiros Espirituales — Administración</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>Retiros Espirituales — Gestión Multi-Retiro</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --cr:#FAF7F2;--cr2:#F3EDE3;--cr3:#E8DFD0;
-  --go:#B8972A;--gl:#D4AF5A;--gf:rgba(184,151,42,.13);
-  --br:#3D2A10;--brl:#5C4020;--brm:#8B6A3A;
-  --tx:#1E1408;--t2:#5C4A2E;--t3:#9C8A6E;
-  --bd:#DDD0B8;--bdl:#EDE5D5;
-  --ok:#2D7A4F;--okb:#EAF6F0;--okd:#A7D9C0;
-  --wn:#A05C00;--wnb:#FFF4E0;--wnd:#F0C060;
-  --er:#8B1E30;--erb:#FFF0F2;--erd:#F0A0B0;
-  --bl:#1A4F7A;--blb:#EAF2FB;--bld:#A0C4E8;
-  --r:10px;--rs:7px;--rx:5px;
-  --sh:0 1px 3px rgba(30,20,8,.06),0 1px 2px rgba(30,20,8,.04);
-  --shm:0 6px 24px rgba(30,20,8,.12),0 2px 8px rgba(30,20,8,.06);
   --f:'Cormorant Garamond',Georgia,serif;
-  --s:'Jost','Segoe UI',sans-serif;
-  --sw:260px;
+  --s:'Jost',sans-serif;
+  --cr:#F8F4EE;--cr2:#F0E8D8;--cr3:#E4D8C4;
+  --tx:#1E1408;--t2:#3A2E22;--t3:#6B6678;
+  --bd:#DDD0B8;--bdl:#EDE5D5;
+  --ok:#1A6B4A;--okb:#E8F5EE;--okd:#8ECFB0;
+  --wn:#8B5800;--wnb:#FFF8EA;--wnd:#F0C84A;
+  --er:#7A1A2E;--erb:#FFF0F3;--erd:#EDABB8;
+  --bl:#1B3F6E;--blb:#EEF3FB;--bld:#A8C8E8;
+  --am:#8B5800;--amb:#FFF8EA;
+  --dt:#78350F;--dtb:#FEF9C3;
+  --sw:240px;--r:8px;--rs:6px;
+  --sh:0 1px 3px rgba(30,20,8,.07);
+  --shm:0 6px 20px rgba(30,20,8,.13);
+  /* retiro activo — override con JS */
+  --rm:#2E1F0C;--rmed:#3A2E22;--rac:#C49A2A;
+  --rli:#F0E8D8;--rxl:#F8F4EE;--rbg:#FFFFFF;
+  --rht:#FFFFFF;--rct:#1E1408;
 }
-html{font-family:var(--s);background:var(--cr);color:var(--tx);font-size:14px;-webkit-font-smoothing:antialiased}
+html{font-family:var(--s);background:var(--cr);color:var(--tx);font-size:13px;-webkit-font-smoothing:antialiased}
 body{display:flex;min-height:100vh}
 
-/* ══ SIDEBAR ═══════════════════════════════════════════════════ */
-.sb{
-  width:var(--sw);min-height:100vh;background:var(--br);
-  display:flex;flex-direction:column;
-  position:fixed;left:0;top:0;bottom:0;z-index:100;
-  overflow-y:auto;
+/* ── SIDEBAR ──────────────────────────────────────────────────── */
+.sb{width:var(--sw);background:#1A1208;position:fixed;top:0;left:0;bottom:0;z-index:100;display:flex;flex-direction:column;overflow-y:auto;transition:transform .2s}
+.sb-top{padding:18px 14px 14px;border-bottom:1px solid rgba(255,255,255,.08);text-align:center}
+.sb-brand{font-family:var(--f);font-size:16px;font-weight:600;color:#FAF7F2;line-height:1.2}
+.sb-sub{font-size:9px;color:rgba(250,247,242,.38);text-transform:uppercase;letter-spacing:1.4px;margin-top:3px}
+.sb-retlist{padding:10px 10px 4px}
+.sb-retlabel{font-size:9px;font-weight:600;color:rgba(250,247,242,.35);text-transform:uppercase;letter-spacing:1.1px;padding:4px 6px 3px}
+.sb-ret-item{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 10px;border-radius:6px;cursor:pointer;
+  transition:background .14s;border:1px solid transparent;
+  margin-bottom:2px;
 }
-.sb-top{padding:24px 16px 16px;border-bottom:1px solid rgba(255,255,255,.09);text-align:center}
-.sb-cross{display:block;margin:0 auto 10px}
-.sb-brand{font-family:var(--f);font-size:18px;font-weight:600;color:#FAF7F2;line-height:1.2;letter-spacing:.2px}
-.sb-ver{font-size:9px;color:rgba(250,247,242,.4);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px}
+.sb-ret-item:hover{background:rgba(255,255,255,.08)}
+.sb-ret-item.active{border-color:rgba(255,255,255,.18)}
+.sb-ret-dot{width:10px;height:10px;border-radius:99px;flex-shrink:0}
+.sb-ret-name{font-size:11.5px;font-weight:500;color:#FAF7F2;flex:1;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-ret-badge{font-size:9px;padding:1px 6px;border-radius:99px;font-weight:600;flex-shrink:0}
+nav.snav{padding:4px 10px 6px;border-top:1px solid rgba(255,255,255,.07);margin-top:4px}
+.nl{font-size:9px;font-weight:600;color:rgba(250,247,242,.32);text-transform:uppercase;letter-spacing:1.1px;padding:8px 8px 3px}
+.ni{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;cursor:pointer;color:rgba(250,247,242,.62);font-size:11.5px;border:none;background:none;width:100%;text-align:left;font-family:var(--s);transition:all .14s}
+.ni:hover{background:rgba(255,255,255,.08);color:#FAF7F2}
+.ni.on{color:#FAF7F2;font-weight:500}
+.ni-i{font-size:14px;width:18px;text-align:center;flex-shrink:0}
+.sb-foot{padding:10px 12px;border-top:1px solid rgba(255,255,255,.07);margin-top:auto}
+.sb-usr{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;cursor:pointer}
+.sb-usr:hover{background:rgba(255,255,255,.06)}
+.sb-av{width:26px;height:26px;border-radius:99px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0}
+.sb-un{font-size:11.5px;font-weight:500;color:#FAF7F2}
+.sb-ur{font-size:9.5px;color:rgba(250,247,242,.4)}
 
-.sb-ret{
-  margin:12px 12px 0;padding:10px 13px;
-  background:rgba(255,255,255,.07);border-radius:var(--rs);
-  border:1px solid rgba(255,255,255,.11);cursor:pointer;
-  transition:background .15s;
-}
-.sb-ret:hover{background:rgba(255,255,255,.12)}
-.sb-rn{font-size:12px;font-weight:600;color:#FAF7F2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sb-rd{font-size:10px;color:rgba(250,247,242,.45);margin-top:2px}
-.sb-ret-empty{
-  margin:12px 12px 0;padding:10px 13px;
-  background:rgba(255,255,255,.03);border-radius:var(--rs);
-  border:1px dashed rgba(255,255,255,.18);cursor:pointer;
-  transition:background .15s;text-align:center;
-}
-.sb-ret-empty:hover{background:rgba(255,255,255,.07)}
-.sb-ret-empty-txt{font-size:11px;color:rgba(250,247,242,.38);font-style:italic}
-.sb-ret-empty-btn{font-size:10px;color:var(--gl);margin-top:3px;font-weight:500}
+/* ── MAIN ─────────────────────────────────────────────────────── */
+.main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{height:50px;background:#fff;border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 20px;gap:9px;position:sticky;top:0;z-index:50}
+.tb-tit{font-family:var(--f);font-size:16px;font-weight:600;flex:1;color:var(--rm)}
+.tb-a{display:flex;gap:6px}
+.mob-btn{display:none;border:none;background:none;cursor:pointer;font-size:18px;color:var(--t2)}
 
-nav.snav{flex:1;padding:8px 10px}
-.nl{font-size:9px;font-weight:600;color:rgba(250,247,242,.38);text-transform:uppercase;letter-spacing:1.2px;padding:10px 8px 4px;margin-top:2px}
-.ni{
-  display:flex;align-items:center;gap:9px;
-  padding:8px 11px;border-radius:var(--rs);
-  cursor:pointer;color:rgba(250,247,242,.68);
-  font-size:12.5px;font-weight:400;
-  border:none;background:none;width:100%;text-align:left;
-  font-family:var(--s);transition:all .15s;
-}
-.ni:hover{background:rgba(255,255,255,.09);color:#FAF7F2}
-.ni.on{background:var(--go);color:#fff;font-weight:500}
-.ni-i{font-size:15px;width:20px;text-align:center;flex-shrink:0;opacity:.7}
-.ni.on .ni-i{opacity:1}
-.ni-b{
-  margin-left:auto;background:var(--er);color:#fff;
-  border-radius:99px;font-size:9px;font-weight:700;
-  min-width:17px;height:17px;display:flex;align-items:center;justify-content:center;padding:0 4px;
-}
-.ni.on .ni-b{background:rgba(255,255,255,.22)}
-
-.sb-foot{padding:10px 12px;border-top:1px solid rgba(255,255,255,.08)}
-.sb-usr{display:flex;align-items:center;gap:9px;padding:7px;border-radius:var(--rs);cursor:pointer}
-.sb-usr:hover{background:rgba(255,255,255,.07)}
-.sb-av{width:28px;height:28px;border-radius:99px;background:var(--go);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0;font-family:var(--s)}
-.sb-un{font-size:12px;font-weight:500;color:#FAF7F2}
-.sb-ur{font-size:10px;color:rgba(250,247,242,.42)}
-
-/* ══ MAIN ════════════════════════════════════════════════════════ */
-.main{margin-left:var(--sw);flex:1;min-height:100vh;display:flex;flex-direction:column}
-.topbar{
-  height:56px;background:var(--cr);border-bottom:1px solid var(--bd);
-  display:flex;align-items:center;padding:0 26px;gap:10px;
-  position:sticky;top:0;z-index:50;
-}
-.tb-tit{font-family:var(--f);font-size:17px;font-weight:600;color:var(--tx);flex:1;letter-spacing:.1px}
-.tb-a{display:flex;align-items:center;gap:7px}
-.mob-m{display:none;border:none;background:none;cursor:pointer;font-size:20px;color:var(--t2);padding:4px}
-
-.pc{padding:26px;max-width:1280px}
+.pc{padding:20px;max-width:1400px;width:100%}
 .pag{display:none}
-.pag.on{display:block;animation:fi .18s ease}
+.pag.on{display:block;animation:fi .17s ease}
 @keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 
-/* ══ PAGE HEADER ═════════════════════════════════════════════════ */
-.ph{margin-bottom:24px}
-.ph h1{font-family:var(--f);font-size:25px;font-weight:600;color:var(--tx);letter-spacing:-.2px;line-height:1.2}
-.ph p{font-size:12.5px;color:var(--t3);margin-top:5px}
+/* ── BUTTONS ─────────────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:5px;font-size:11.5px;font-weight:500;cursor:pointer;border:none;font-family:var(--s);transition:all .14s;line-height:1}
+.bp{color:#fff}.bp:hover{filter:brightness(1.1)}
+.bs{background:#fff;color:var(--tx);border:1px solid var(--bd)}.bs:hover{background:var(--cr2)}
+.bsm{padding:5px 11px;font-size:11px}
+.bic{width:30px;height:30px;padding:0;justify-content:center}
+.bd2{background:var(--erb);color:var(--er);border:1px solid var(--erd)}.bd2:hover{filter:brightness(.95)}
 
-/* ══ CARDS ════════════════════════════════════════════════════════ */
-.card{background:#fff;border:1px solid var(--bd);border-radius:var(--r);padding:20px;box-shadow:var(--sh)}
-.ch{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:10px}
-.ct{font-family:var(--f);font-size:15px;font-weight:600;color:var(--tx)}
-.cs{font-size:11px;color:var(--t3);margin-top:2px}
-.ca{font-size:11px;color:var(--t3);cursor:pointer;border:none;background:none;font-family:var(--s);transition:color .15s;white-space:nowrap}
-.ca:hover{color:var(--go)}
+/* ── PAGE HEADER ─────────────────────────────────────────────── */
+.ph{margin-bottom:18px}
+.ph h1{font-family:var(--f);font-size:23px;font-weight:600;letter-spacing:-.2px;color:var(--rm)}
+.ph p{font-size:11.5px;color:var(--t3);margin-top:4px}
 
-/* ══ STAT GRID ═══════════════════════════════════════════════════ */
-.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:24px}
-.sc{
-  background:#fff;border:1px solid var(--bd);
-  border-radius:var(--r);padding:16px;box-shadow:var(--sh);
-  cursor:pointer;transition:transform .15s,box-shadow .15s;
-  position:relative;overflow:hidden;
-}
-.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
-.sc.s-go::before{background:linear-gradient(90deg,var(--go),var(--gl))}
-.sc.s-ok::before{background:var(--ok)}
-.sc.s-er::before{background:var(--er)}
-.sc.s-bl::before{background:var(--bl)}
-.sc.s-wn::before{background:var(--wn)}
-.sc:hover{transform:translateY(-2px);box-shadow:var(--shm)}
-.sc-i{font-size:20px;margin-bottom:8px}
-.sc-v{font-family:var(--f);font-size:28px;font-weight:600;color:var(--tx);line-height:1}
-.sc-l{font-size:10px;color:var(--t3);margin-top:4px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+/* ── BANNER ──────────────────────────────────────────────────── */
+.banner{border-radius:var(--r);padding:20px 24px;margin-bottom:18px}
+.banner h1{font-family:var(--f);font-size:22px;font-weight:700;margin-bottom:4px}
+.banner p{font-size:11px;opacity:.75}
+.banner .vs{font-family:var(--f);font-size:13px;font-style:italic;opacity:.85;margin-top:8px}
 
-/* ══ BADGES ══════════════════════════════════════════════════════ */
-.badge{display:inline-flex;align-items:center;font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:99px;border:1px solid;font-family:var(--s)}
+/* ── KPI GRID ────────────────────────────────────────────────── */
+.kg{display:grid;gap:10px;margin-bottom:18px}
+.kg6{grid-template-columns:repeat(6,1fr)}
+.kg4{grid-template-columns:repeat(4,1fr)}
+.kg5{grid-template-columns:repeat(5,1fr)}
+.kpi{border-radius:var(--r);padding:14px;cursor:pointer;transition:transform .14s,box-shadow .14s}
+.kpi:hover{transform:translateY(-2px);box-shadow:var(--shm)}
+.kpi-i{font-size:18px;margin-bottom:6px}
+.kpi-v{font-family:var(--f);font-size:26px;font-weight:600;line-height:1;color:#fff}
+.kpi-l{font-size:9px;font-weight:600;color:rgba(255,255,255,.72);text-transform:uppercase;letter-spacing:.5px;margin-top:3px}
+
+/* ── CARD ────────────────────────────────────────────────────── */
+.card{background:#fff;border:1px solid var(--bd);border-radius:var(--r);padding:17px;box-shadow:var(--sh)}
+.ct{font-family:var(--f);font-size:14px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.gm{display:grid;grid-template-columns:1fr 320px;gap:13px}
+.mb{margin-bottom:13px}
+
+/* ── PROGRESS ────────────────────────────────────────────────── */
+.pb{height:6px;background:var(--cr3);border-radius:99px;overflow:hidden;margin:5px 0}
+.pf{height:100%;border-radius:99px;transition:width .4s ease}
+
+/* ── ALERT BOXES ─────────────────────────────────────────────── */
+.al{display:flex;gap:8px;align-items:flex-start;padding:9px 12px;border-radius:5px;margin:5px 0;font-size:11.5px;line-height:1.55}
+.aw{background:var(--wnb);border:1px solid var(--wnd);color:var(--wn)}
+.ae{background:var(--erb);border:1px solid var(--erd);color:var(--er)}
+.ai{background:var(--blb);border:1px solid var(--bld);color:var(--bl)}
+.ag{background:var(--okb);border:1px solid var(--okd);color:var(--ok)}
+
+/* ── BADGE ───────────────────────────────────────────────────── */
+.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:2px 7px;border-radius:99px;border:1px solid}
 .b-ok{background:var(--okb);color:var(--ok);border-color:var(--okd)}
 .b-wn{background:var(--wnb);color:var(--wn);border-color:var(--wnd)}
 .b-er{background:var(--erb);color:var(--er);border-color:var(--erd)}
 .b-bl{background:var(--blb);color:var(--bl);border-color:var(--bld)}
-.b-go{background:var(--gf);color:var(--brl);border-color:rgba(184,151,42,.28)}
 .b-ne{background:var(--cr2);color:var(--t2);border-color:var(--bd)}
 
-/* ══ TAGS ════════════════════════════════════════════════════════ */
-.tag{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:99px;font-size:10px;font-weight:600;margin:1px;border:1px solid}
-.t-med{background:#EEF2FF;color:#3730A3;border-color:#C7D2FE}
-.t-die{background:#FEF3C7;color:#78350F;border-color:#FCD34D}
-.t-aly{background:#FFF7ED;color:#9A3412;border-color:#FCA;font-style:normal}
-.t-pag{background:var(--okb);color:var(--ok);border-color:var(--okd)}
-.t-par{background:var(--wnb);color:var(--wn);border-color:var(--wnd)}
-.t-nop{background:var(--erb);color:var(--er);border-color:var(--erd)}
-
-/* ══ BUTTONS ═════════════════════════════════════════════════════ */
-.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:var(--rs);font-size:12.5px;font-weight:500;cursor:pointer;border:none;font-family:var(--s);transition:all .15s;line-height:1}
-.bp{background:var(--go);color:#fff}.bp:hover{background:var(--brl)}
-.bs{background:#fff;color:var(--tx);border:1px solid var(--bd)}.bs:hover{background:var(--cr2)}
-.bd2{background:var(--erb);color:var(--er);border:1px solid var(--erd)}.bd2:hover{background:#fee}
-.bsm{padding:5px 12px;font-size:11.5px}
-.bic{padding:7px;width:34px;height:34px;justify-content:center}
-
-/* ══ FILTER TABS ═════════════════════════════════════════════════ */
-.ft{display:flex;gap:2px;background:var(--cr2);border-radius:var(--rs);padding:3px;width:fit-content;margin-bottom:16px;flex-wrap:wrap}
-.ftb{padding:6px 14px;border-radius:var(--rx);font-size:11.5px;font-weight:500;cursor:pointer;color:var(--t3);border:none;background:none;font-family:var(--s);transition:all .15s}
+/* ── TABS ────────────────────────────────────────────────────── */
+.ft{display:flex;gap:2px;background:var(--cr2);border-radius:5px;padding:3px;width:fit-content;margin-bottom:13px;flex-wrap:wrap}
+.ftb{padding:5px 11px;border-radius:4px;font-size:11px;font-weight:500;cursor:pointer;color:var(--t3);border:none;background:none;font-family:var(--s);transition:all .14s}
 .ftb.on{background:#fff;color:var(--tx);box-shadow:var(--sh)}
 
-/* ══ TABLE ════════════════════════════════════════════════════════ */
-.tw{overflow-x:auto;border-radius:var(--r);border:1px solid var(--bd);box-shadow:var(--sh)}
-.tbl{width:100%;border-collapse:collapse}
-.tbl th{font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;padding:9px 11px;border-bottom:2px solid var(--bd);text-align:left;background:var(--cr);white-space:nowrap}
-.tbl td{padding:10px 11px;border-bottom:1px solid var(--bdl);font-size:12.5px;color:var(--t2);vertical-align:middle}
-.tbl tr:last-child td{border-bottom:none}
-.tbl tr:hover td{background:var(--cr)}
+/* ── SPREADSHEET TABLE ───────────────────────────────────────── */
+.tw{overflow-x:auto;border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh)}
+.xtbl{width:100%;border-collapse:collapse;font-size:11.5px}
+.xtbl th{
+  color:#fff;font-size:9.5px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.5px;
+  padding:8px 9px;border:1px solid rgba(255,255,255,.15);
+  text-align:center;white-space:nowrap;
+  position:sticky;top:0;z-index:10;
+}
+.xtbl th.tl{text-align:left}
+.xtbl th.rn{width:30px;font-size:9px;color:rgba(255,255,255,.4);background:rgba(0,0,0,.2)!important}
+.xtbl td{border:1px solid var(--bdl);padding:0;vertical-align:middle;position:relative}
+.row-num{background:var(--cr2)!important;color:var(--t3);font-size:10px;text-align:center;padding:0 5px;border-right:2px solid var(--bd)!important;width:30px;cursor:default;user-select:none}
 
-/* ══ AVATAR ══════════════════════════════════════════════════════ */
-.av{border-radius:99px;display:flex;align-items:center;justify-content:center;font-weight:600;color:#fff;flex-shrink:0;font-family:var(--s)}
-.pn{display:flex;align-items:center;gap:9px}
-.pnf{font-size:12.5px;font-weight:500;color:var(--tx)}
-.pns{font-size:10.5px;color:var(--t3);margin-top:1px}
+/* ── EDITABLE CELL ───────────────────────────────────────────── */
+.xcel{display:block;width:100%;padding:6px 8px;background:transparent;border:none;outline:none;font-family:var(--s);font-size:11.5px;color:var(--tx);cursor:cell;min-height:30px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.xcel:focus{background:#fff;box-shadow:0 0 0 2px var(--rac) inset;z-index:5;position:relative;cursor:text;white-space:normal;overflow:visible}
+select.xcel{cursor:pointer;-webkit-appearance:none}
 
-/* ══ MODAL ════════════════════════════════════════════════════════ */
-.mo{display:none;position:fixed;inset:0;background:rgba(30,20,8,.48);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
-.mo.on{display:flex}
-.modal{background:#fff;border-radius:var(--r);padding:26px;max-width:580px;width:94%;box-shadow:0 20px 60px rgba(30,20,8,.22);animation:su .2s ease;max-height:92vh;overflow-y:auto}
-@keyframes su{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}
-.mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-.mt{font-family:var(--f);font-size:19px;font-weight:600;color:var(--tx)}
-.mx{width:28px;height:28px;border-radius:var(--rx);border:1px solid var(--bd);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--t3)}
-.mx:hover{background:var(--cr2)}
+/* ── UNIVERSAL SEMAPHORES ────────────────────────────────────── */
+.s-ok   {background:var(--okb)!important;color:var(--ok)!important;font-weight:600}
+.s-warn {background:var(--wnb)!important;color:var(--wn)!important;font-weight:600}
+.s-err  {background:var(--erb)!important;color:var(--er)!important;font-weight:600}
+.s-blue {background:var(--blb)!important;color:var(--bl)!important;font-weight:600}
+.s-med  {background:var(--wnb)!important;color:var(--wn)!important}
+.s-diet {background:var(--dtb)!important;color:var(--dt)!important}
+.s-cond {background:var(--erb)!important;color:var(--er)!important}
+/* Row semaphores */
+tr.rp td{background:var(--okb)!important}
+tr.rn2 td{background:var(--erb)!important}
+tr.rd td{background:var(--blb)!important}
+tr.ra td{background:var(--erb)!important}
+tr.rs td{background:var(--wnb)!important}
 
-/* ══ FORM ═════════════════════════════════════════════════════════ */
-.fg{margin-bottom:13px}
-.fl{display:block;font-size:10px;font-weight:600;color:var(--t2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
-.fi{width:100%;padding:8px 11px;border:1px solid var(--bd);border-radius:var(--rx);background:var(--cr);color:var(--tx);font-size:12.5px;font-family:var(--s);outline:none;transition:border-color .15s}
-.fi:focus{border-color:var(--go);background:#fff}
-.fr{display:grid;grid-template-columns:1fr 1fr;gap:11px}
-.fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px}
-.fa{display:flex;gap:7px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--bdl)}
+/* ── RECAUD ROW ──────────────────────────────────────────────── */
+.rec-row{display:flex;justify-content:space-between;align-items:center;padding:6px 9px;border-radius:5px;margin-bottom:4px}
+.rec-lbl{font-size:11px;font-weight:500}
+.rec-val{font-family:var(--f);font-size:14px;font-weight:600}
 
-/* ══ ALERT BOXES ══════════════════════════════════════════════════ */
-.al{display:flex;gap:9px;align-items:flex-start;padding:11px 14px;border-radius:var(--rs);margin:7px 0;font-size:12px;line-height:1.6}
-.aw{background:var(--wnb);border:1px solid var(--wnd);color:var(--wn)}
-.ai{background:var(--blb);border:1px solid var(--bld);color:var(--bl)}
-.ag{background:var(--okb);border:1px solid var(--okd);color:var(--ok)}
-.ae{background:var(--erb);border:1px solid var(--erd);color:var(--er)}
-.al-i{font-size:15px;flex-shrink:0;margin-top:1px}
-
-/* ══ ORG CARDS ════════════════════════════════════════════════════ */
-.og{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:13px}
-.oc{background:#fff;border:1px solid var(--bd);border-radius:var(--r);padding:15px;box-shadow:var(--sh);border-top:3px solid}
-.oc.cocina{border-top-color:#C45800}
-.oc.platos{border-top-color:#6D28D9}
-.oc.limpieza{border-top-color:#1D4ED8}
-.oc.orden{border-top-color:#047857}
-.oc.alabanza{border-top-color:#BE185D}
-.oc.oracion{border-top-color:var(--go)}
-.oc.transporte{border-top-color:#475569}
-.oc.enfermeria{border-top-color:#DC2626}
-.oc-t{font-family:var(--f);font-size:14px;font-weight:600;color:var(--tx);margin-bottom:10px;display:flex;align-items:center;gap:7px}
-.om{display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid var(--bdl)}
+/* ── ORGANIGRAMA ─────────────────────────────────────────────── */
+.og{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.oc{background:#fff;border:1px solid var(--bd);border-radius:var(--r);padding:13px;border-top:3px solid;box-shadow:var(--sh)}
+.oc-t{font-family:var(--f);font-size:13px;font-weight:600;margin-bottom:9px}
+.om{display:flex;align-items:center;gap:7px;padding:4px 0;border-bottom:1px solid var(--bdl)}
 .om:last-child{border-bottom:none}
-.or{font-size:10px;color:var(--t3);margin-left:auto;font-weight:500;white-space:nowrap}
+.or2{font-size:9.5px;color:var(--t3);margin-left:auto;white-space:nowrap}
+.av{border-radius:99px;display:flex;align-items:center;justify-content:center;font-weight:600;color:#fff;flex-shrink:0}
 
-/* ══ PROGRESS ════════════════════════════════════════════════════ */
-.pb{height:5px;background:var(--cr3);border-radius:99px;overflow:hidden}
-.pf{height:100%;border-radius:99px;transition:width .5s ease}
-.pf-go{background:linear-gradient(90deg,var(--go),var(--gl))}
-.pf-ok{background:var(--ok)}
-.pf-er{background:var(--er)}
+/* ── SCHEDULE ────────────────────────────────────────────────── */
+.si{display:flex;gap:11px;align-items:center;padding:9px 12px;border-radius:5px;border:1px solid var(--bdl);margin-bottom:5px}
+.st{font-family:var(--f);font-size:14px;font-weight:600;min-width:46px;flex-shrink:0}
+.sa{font-size:12px;font-weight:500}
+.sd{font-size:10.5px;color:var(--t3);margin-top:1px}
 
-/* ══ SCHEDULE ════════════════════════════════════════════════════ */
-.sch{display:flex;flex-direction:column;gap:7px}
-.si{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--cr);border-radius:var(--rs);border:1px solid var(--bdl)}
-.st{font-family:var(--f);font-size:15px;font-weight:600;color:var(--go);min-width:50px;flex-shrink:0}
-.sa{font-size:12.5px;font-weight:500;color:var(--tx)}
-.sd{font-size:11px;color:var(--t3);margin-top:1px}
-.sic{font-size:18px;width:34px;height:34px;background:#fff;border-radius:var(--rx);display:flex;align-items:center;justify-content:center;border:1px solid var(--bd);flex-shrink:0}
-
-/* ══ ORNAMENT DIVIDER ════════════════════════════════════════════ */
-.orn{display:flex;align-items:center;gap:9px;color:var(--t3);margin:14px 0 12px}
+/* ── MODAL ───────────────────────────────────────────────────── */
+.mo{display:none;position:fixed;inset:0;background:rgba(20,14,4,.48);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.mo.on{display:flex}
+.modal{background:#fff;border-radius:var(--r);padding:22px;max-width:580px;width:94%;box-shadow:0 20px 60px rgba(20,14,4,.22);animation:su .18s ease;max-height:92vh;overflow-y:auto}
+@keyframes su{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}
+.mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.mt{font-family:var(--f);font-size:18px;font-weight:600}
+.mx{width:26px;height:26px;border-radius:4px;border:1px solid var(--bd);background:none;cursor:pointer;font-size:13px;color:var(--t3)}
+.mx:hover{background:var(--cr2)}
+.fg{margin-bottom:11px}
+.fl{display:block;font-size:9.5px;font-weight:600;color:var(--t2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.fi{width:100%;padding:7px 9px;border:1px solid var(--bd);border-radius:5px;background:var(--cr);color:var(--tx);font-size:11.5px;font-family:var(--s);outline:none;transition:border-color .14s}
+.fi:focus{border-color:var(--rac);background:#fff}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.fa{display:flex;gap:6px;justify-content:flex-end;margin-top:16px;padding-top:13px;border-top:1px solid var(--bdl)}
+.orn{display:flex;align-items:center;gap:8px;color:var(--t3);margin:12px 0 10px}
 .orn::before,.orn::after{content:'';flex:1;height:1px;background:var(--bdl)}
-.orn span{font-size:10px;text-transform:uppercase;letter-spacing:.9px;white-space:nowrap}
+.orn span{font-size:9.5px;text-transform:uppercase;letter-spacing:.8px;white-space:nowrap}
 
-/* ══ VERSICULO BOX ════════════════════════════════════════════════ */
-.vbox{
-  background:linear-gradient(135deg,var(--br),#2A1808);
-  border-radius:var(--r);padding:20px;text-align:center;
-}
-.vbox-cross{font-size:26px;opacity:.6;margin-bottom:8px}
-.vbox-txt{font-family:var(--f);font-size:14px;font-style:italic;color:rgba(250,247,242,.88);line-height:1.7}
-.vbox-ref{font-size:10px;color:rgba(250,247,242,.45);text-transform:uppercase;letter-spacing:1px;margin-top:8px}
+/* ── VERSÍCULO BOX ───────────────────────────────────────────── */
+.vbox{border-radius:var(--r);padding:16px;text-align:center}
+.vbox-txt{font-family:var(--f);font-size:13px;font-style:italic;line-height:1.7;color:rgba(255,255,255,.88)}
+.vbox-ref{font-size:9.5px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:1px;margin-top:6px}
 
-/* ══ PAY ROW ═════════════════════════════════════════════════════ */
-.pr{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bdl)}
-.pr:last-child{border-bottom:none}
-.prn{flex:1;font-size:12.5px;font-weight:500;color:var(--tx)}
-.pra{font-family:var(--f);font-size:13px;font-weight:600}
-
-/* ══ GRID LAYOUTS ════════════════════════════════════════════════ */
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
-.gm{display:grid;grid-template-columns:1fr 360px;gap:14px}
-.div{height:1px;background:var(--bdl);margin:14px 0}
-.mb{margin-bottom:14px}
-
-/* ══ TOAST ═══════════════════════════════════════════════════════ */
-#ta{position:fixed;bottom:22px;right:22px;z-index:300;display:flex;flex-direction:column;gap:7px;pointer-events:none}
-.tk{
-  background:var(--br);color:#FAF7F2;padding:10px 16px;
-  border-radius:var(--rs);font-size:12.5px;font-weight:500;
-  box-shadow:var(--shm);animation:ti .2s ease;
-  display:flex;align-items:center;gap:7px;max-width:300px;
-  pointer-events:all;
-}
-@keyframes ti{from{transform:translateX(16px);opacity:0}to{transform:translateX(0);opacity:1}}
+/* ── TOAST ───────────────────────────────────────────────────── */
+#ta{position:fixed;bottom:18px;right:18px;z-index:300;display:flex;flex-direction:column;gap:6px}
+.tk{padding:9px 14px;border-radius:6px;font-size:12px;font-weight:500;box-shadow:var(--shm);animation:ti .18s ease;max-width:280px;color:#fff}
+@keyframes ti{from{transform:translateX(12px);opacity:0}to{transform:translateX(0);opacity:1}}
 .tk.ok{background:var(--ok)}.tk.wn{background:var(--wn)}.tk.er{background:var(--er)}
 
-/* ══ MOBILE ══════════════════════════════════════════════════════ */
-@media(max-width:860px){
+/* ── RESPONSIVE ──────────────────────────────────────────────── */
+@media(max-width:900px){
   .sb{transform:translateX(-100%)}.sb.on{transform:translateX(0)}
-  .main{margin-left:0}.mob-m{display:block}
-  .gm,.g2,.g3{grid-template-columns:1fr}
-  .sg{grid-template-columns:repeat(2,1fr)}
-  .pc{padding:14px}
-  .og{grid-template-columns:1fr}
+  .main{margin-left:0}.mob-btn{display:block}
+  .kg6,.kg4,.kg5{grid-template-columns:repeat(3,1fr)}
+  .gm,.g2{grid-template-columns:1fr}
+  .pc{padding:12px}
 }
 ::-webkit-scrollbar{width:4px;height:4px}
-::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--bd);border-radius:99px}
 </style>
 </head>
 <body>
 
-<!-- ═══ SIDEBAR ══════════════════════════════════════════════════ -->
 <aside class="sb" id="sb">
   <div class="sb-top">
-    <svg class="sb-cross" width="32" height="40" viewBox="0 0 32 40"><rect x="12" y="0" width="8" height="40" rx="2" fill="#D4AF5A" opacity=".9"/><rect x="0" y="12" width="32" height="8" rx="2" fill="#D4AF5A" opacity=".9"/></svg>
-    <div class="sb-brand">Retiros<br>Espirituales</div>
-    <div class="sb-ver">Sistema de Gestión</div>
+    <svg width="28" height="34" viewBox="0 0 28 34" style="display:block;margin:0 auto 7px"><rect x="10" y="0" width="8" height="34" rx="2" fill="#D4AF5A" opacity=".9"/><rect x="0" y="10" width="28" height="8" rx="2" fill="#D4AF5A" opacity=".9"/></svg>
+    <div class="sb-brand">Retiros Espirituales</div>
+    <div class="sb-sub">Gestión Multi-Retiro</div>
   </div>
-  <div class="sb-ret" id="sb-ret-box" onclick="nav('dashboard')">
-    <div class="sb-rn" id="sb-rn">Retiro Jóvenes 2025</div>
-    <div class="sb-rd" id="sb-rd">12–14 Sep · Casa de Retiros La Paz</div>
+
+  <div class="sb-retlist">
+    <div class="sb-retlabel">Retiros</div>
+    <div id="sb-rets"></div>
   </div>
+
   <nav class="snav">
-    <div class="nl">Principal</div>
-    <button class="ni on" data-p="dashboard" onclick="nav('dashboard')"><span class="ni-i">🏠</span>Dashboard</button>
-    <button class="ni" data-p="alertas" onclick="nav('alertas')"><span class="ni-i">🔔</span>Alertas<span class="ni-b" id="ab">4</span></button>
-    <div class="nl">Participantes</div>
-    <button class="ni" data-p="part" onclick="nav('part')"><span class="ni-i">👥</span>Participantes</button>
-    <button class="ni" data-p="pagos" onclick="nav('pagos')"><span class="ni-i">💰</span>Pagos &amp; Cuotas</button>
-    <button class="ni" data-p="salud" onclick="nav('salud')"><span class="ni-i">💊</span>Salud &amp; Dietas</button>
-    <button class="ni" data-p="aloj" onclick="nav('aloj')"><span class="ni-i">🛏</span>Alojamiento</button>
-    <div class="nl">Organización</div>
-    <button class="ni" data-p="org" onclick="nav('org')"><span class="ni-i">📋</span>Organigrama</button>
-    <button class="ni" data-p="comidas" onclick="nav('comidas')"><span class="ni-i">🍽</span>Comidas</button>
-    <button class="ni" data-p="programa" onclick="nav('programa')"><span class="ni-i">📅</span>Programa</button>
-    <button class="ni" data-p="retiros" onclick="nav('retiros')"><span class="ni-i">✞</span>Mis Retiros</button>
+    <div class="nl">Retiro activo</div>
+    <button class="ni on" data-v="dashboard"  onclick="nav('dashboard')"><span class="ni-i">📊</span>Dashboard</button>
+    <button class="ni"    data-v="datos"      onclick="nav('datos')"><span class="ni-i">👥</span>Participantes</button>
+    <button class="ni"    data-v="pagos"      onclick="nav('pagos')"><span class="ni-i">💰</span>Pagos &amp; Cuotas</button>
+    <button class="ni"    data-v="salud"      onclick="nav('salud')"><span class="ni-i">💊</span>Salud &amp; Dietas</button>
+    <button class="ni"    data-v="aloj"       onclick="nav('aloj')"><span class="ni-i">🛏</span>Alojamiento</button>
+    <button class="ni"    data-v="org"        onclick="nav('org')"><span class="ni-i">📋</span>Organigrama</button>
+    <button class="ni"    data-v="prog"       onclick="nav('prog')"><span class="ni-i">📅</span>Programa</button>
+    <div class="nl">Global</div>
+    <button class="ni"    data-v="index"      onclick="nav('index')"><span class="ni-i">🌐</span>Índice General</button>
+    <button class="ni"    data-v="comp"       onclick="nav('comp')"><span class="ni-i">📈</span>Comparativo</button>
   </nav>
+
   <div class="sb-foot">
-    <div class="sb-usr" onclick="editCoord()" title="Clic para editar nombre">
-      <div class="sb-av" id="sb-av">P</div>
-      <div>
-        <div class="sb-un" id="sb-un">Pastor Juan</div>
-        <div class="sb-ur">Coordinador General</div>
-      </div>
+    <div class="sb-usr" onclick="editCoord()">
+      <div class="sb-av" id="sb-av" style="background:#C49A2A">P</div>
+      <div><div class="sb-un" id="sb-un">Pastor Juan</div><div class="sb-ur">Coordinador General</div></div>
     </div>
   </div>
 </aside>
 
-<!-- ═══ MAIN ══════════════════════════════════════════════════════ -->
 <main class="main">
   <header class="topbar">
-    <button class="mob-m" onclick="tglSb()">☰</button>
-    <span class="tb-tit" id="tbt">Dashboard</span>
+    <button class="mob-btn" onclick="document.getElementById('sb').classList.toggle('on')">☰</button>
+    <span class="tb-tit" id="tb-tit">Dashboard</span>
     <div class="tb-a">
-      <button class="btn bp bsm" onclick="openM('m-np')">＋ Participante</button>
-      <button class="btn bs bsm" onclick="refreshAll();toast('Todo actualizado ✓','ok')" title="Refrescar todos los módulos">🔄 Refrescar</button>
-      <button class="btn bs bic" onclick="nav('alertas')" title="Alertas">🔔</button>
+      <button class="btn bp bsm" id="btn-reto" onclick="openM('m-ret')" style="background:var(--rmed)">✏️ Editar retiro</button>
+      <button class="btn bp bsm" onclick="openM('m-np')" style="background:var(--rm)">＋ Participante</button>
+      <button class="btn bs bsm" onclick="refreshAll();toast('Actualizado ✓','ok')">🔄 Refrescar</button>
+      <span class="badge b-er" id="alert-badge" style="cursor:pointer" onclick="nav('dashboard')">0</span>
     </div>
   </header>
 
-  <!-- ══ DASHBOARD ═════════════════════════════════════════════ -->
+  <!-- ═══ DASHBOARD ══════════════════════════════════════════════ -->
   <div class="pag on pc" id="p-dashboard">
-    <div class="ph"><h1 id="dash-h1">✞ Retiro Jóvenes 2025</h1><p id="dash-sub">12–14 de Septiembre · Casa de Retiros La Paz · Salta</p></div>
-    <div class="sg">
-      <div class="sc s-go" onclick="nav('part')"><div class="sc-i">👥</div><div class="sc-v" id="s-tot">28</div><div class="sc-l">Inscriptos</div></div>
-      <div class="sc s-ok" onclick="nav('pagos')"><div class="sc-i">✅</div><div class="sc-v" id="s-pag">19</div><div class="sc-l">Pagos completos</div></div>
-      <div class="sc s-er" onclick="nav('pagos')"><div class="sc-i">⏳</div><div class="sc-v" id="s-deu">9</div><div class="sc-l">Con deuda</div></div>
-      <div class="sc s-bl" onclick="nav('aloj')"><div class="sc-i">🛏</div><div class="sc-v" id="s-dor">22</div><div class="sc-l">Duermen</div></div>
-      <div class="sc s-wn" onclick="nav('salud')"><div class="sc-i">💊</div><div class="sc-v" id="s-med">7</div><div class="sc-l">Toman remedios</div></div>
-      <div class="sc s-wn" onclick="nav('salud')"><div class="sc-i">🥗</div><div class="sc-v" id="s-die">5</div><div class="sc-l">Dieta especial</div></div>
+    <div class="banner" id="dash-banner">
+      <h1 id="dash-h1"></h1><p id="dash-sub"></p>
+      <div class="vs" id="dash-vs"></div>
     </div>
+    <div class="kg kg6" id="dash-kpis"></div>
     <div class="gm">
       <div>
         <div class="card mb">
-          <div class="ch"><div><div class="ct">⚠️ Alertas urgentes</div><div class="cs" id="dash-alerta-cs">Requieren atención</div></div><button class="ca" onclick="nav('alertas')">Ver todas →</button></div>
-          <div id="dash-alertas-body"></div>
+          <div class="ct">💰 Recaudación</div>
+          <div id="dash-rec"></div>
+          <div class="pb"><div class="pf" id="dash-pf" style="width:0%"></div></div>
+          <div style="font-size:10px;color:var(--t3);margin-top:4px" id="dash-pct-lbl"></div>
         </div>
-        <div class="card">
-          <div class="ch"><div><div class="ct">Últimas inscripciones</div></div><button class="ca" onclick="nav('part')">Ver todos →</button></div>
-          <table class="tbl">
-            <thead><tr><th>Participante</th><th>Pago</th><th>Alojamiento</th><th></th></tr></thead>
-            <tbody id="dash-tbody"></tbody>
-          </table>
-        </div>
+        <div class="card mb"><div class="ct">⚠️ Alertas</div><div id="dash-alertas"></div></div>
+        <div class="card"><div class="ct">📋 Últimas inscripciones</div><div id="dash-ultimos"></div></div>
       </div>
       <div>
-        <div class="card mb">
-          <div class="ch"><div><div class="ct">Recaudación</div><div class="cs" id="dash-rec-cs">Total esperado: —</div></div></div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
-            <span style="font-size:12px;font-weight:500">Cobrado</span>
-            <span style="font-family:var(--f);font-size:17px;font-weight:600;color:var(--ok)" id="dash-cobrado">$0</span>
-          </div>
-          <div class="pb"><div class="pf pf-ok" id="dash-pf" style="width:0%"></div></div>
-          <div style="font-size:10px;color:var(--t3);margin-top:5px" id="dash-pct">0% · Faltan $0</div>
-          <div class="div"></div>
-          <div class="pr"><span class="prn" id="dash-pr-pag">✅ Pagados completos (0)</span><span class="pra" style="color:var(--ok)" id="dash-monto-pag">$0</span></div>
-          <div class="pr"><span class="prn" id="dash-pr-par">⏳ Parciales (0)</span><span class="pra" style="color:var(--wn)" id="dash-monto-par">$0</span></div>
-          <div class="pr"><span class="prn" id="dash-pr-nop">❌ Sin abonar (0)</span><span class="pra" style="color:var(--er)" id="dash-monto-nop">$0</span></div>
-        </div>
-        <div class="card mb">
-          <div class="ch"><div class="ct">Alojamiento rápido</div></div>
-          <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px">
-            <div style="flex:1;text-align:center;padding:12px 8px;background:var(--cr);border-radius:var(--rs);border:1px solid var(--bdl)">
-              <div style="font-family:var(--f);font-size:22px;font-weight:600;color:var(--ok)" id="dash-duerme">0</div>
-              <div style="font-size:10px;color:var(--t3);margin-top:2px">Duermen</div>
-            </div>
-            <div style="flex:1;text-align:center;padding:12px 8px;background:var(--cr);border-radius:var(--rs);border:1px solid var(--bdl)">
-              <div style="font-family:var(--f);font-size:22px;font-weight:600;color:var(--wn)" id="dash-dia">0</div>
-              <div style="font-size:10px;color:var(--t3);margin-top:2px">Solo día</div>
-            </div>
-            <div style="flex:1;text-align:center;padding:12px 8px;background:var(--cr);border-radius:var(--rs);border:1px solid var(--bdl)">
-              <div style="font-family:var(--f);font-size:22px;font-weight:600;color:var(--er)" id="dash-antes">0</div>
-              <div style="font-size:10px;color:var(--t3);margin-top:2px">Se van antes</div>
-            </div>
-          </div>
-          <button class="btn bs bsm" style="width:100%" onclick="nav('aloj')">Ver distribución →</button>
-        </div>
-        <div class="vbox">
-          <div class="vbox-cross">✞</div>
-          <div class="vbox-txt" id="dash-versiculo">"Venid a mí todos los que estáis trabajados y cargados, y yo os haré descansar."</div>
-          <div class="vbox-ref" id="dash-versiculo-ref">Mateo 11:28</div>
-        </div>
+        <div class="card mb"><div class="ct">🛏 Alojamiento</div><div id="dash-aloj"></div></div>
+        <div class="card mb"><div class="ct">💊 Medicación</div><div id="dash-meds" style="font-size:11px"></div></div>
+        <div class="vbox" id="dash-vbox"><div style="font-size:22px;margin-bottom:7px;opacity:.6">✞</div><div class="vbox-txt" id="dash-vbox-txt"></div><div class="vbox-ref" id="dash-vbox-ref"></div></div>
       </div>
     </div>
   </div>
 
-  <!-- ══ PARTICIPANTES ══════════════════════════════════════════ -->
-  <div class="pag pc" id="p-part">
-    <div class="ph"><h1>Participantes</h1><p id="part-sub">28 inscriptos · Retiro Jóvenes 2025</p></div>
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
-      <div class="ft">
-        <button class="ftb on" onclick="fTab(this,'todos')">Todos</button>
-        <button class="ftb" onclick="fTab(this,'duerme')">Duermen</button>
-        <button class="ftb" onclick="fTab(this,'dia')">Solo día</button>
-        <button class="ftb" onclick="fTab(this,'antes')">Se van antes</button>
-        <button class="ftb" onclick="fTab(this,'meds')">Con medicación</button>
-        <button class="ftb" onclick="fTab(this,'dieta')">Con dieta</button>
+  <!-- ═══ PARTICIPANTES ══════════════════════════════════════════ -->
+  <div class="pag pc" id="p-datos">
+    <div class="ph"><h1>Participantes</h1><p id="datos-sub"></p></div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+      <div class="ft" id="datos-ft">
+        <button class="ftb on" onclick="setFilter(this,'')">Todos</button>
+        <button class="ftb" onclick="setFilter(this,'Pagado')">Pagados</button>
+        <button class="ftb" onclick="setFilter(this,'Parcial')">Parciales</button>
+        <button class="ftb" onclick="setFilter(this,'Sin pagar')">Sin abonar</button>
+        <button class="ftb" onclick="setFilter(this,'Duerme')">Duermen</button>
+        <button class="ftb" onclick="setFilter(this,'med')">Con medicación</button>
       </div>
-      <button class="btn bp bsm" onclick="openM('m-np')">＋ Agregar</button>
+      <button class="btn bp bsm" onclick="openM('m-np')" style="background:var(--rm)">＋ Agregar</button>
+      <button class="btn bs bsm" onclick="exportCSV()">📄 Exportar CSV</button>
     </div>
-    <div class="tw"><table class="tbl"><thead><tr><th>Participante</th><th>Celular</th><th>Pago</th><th>Alojamiento</th><th>Salud</th><th></th></tr></thead><tbody id="ptb"></tbody></table></div>
+    <div class="tw">
+      <table class="xtbl" id="datos-tbl">
+        <thead id="datos-thead"></thead>
+        <tbody id="datos-tbody"></tbody>
+      </table>
+    </div>
   </div>
 
-  <!-- ══ PAGOS ══════════════════════════════════════════════════ -->
+  <!-- ═══ PAGOS ══════════════════════════════════════════════════ -->
   <div class="pag pc" id="p-pagos">
-    <div class="ph"><h1>Pagos &amp; Cuotas</h1><p id="pag-sub">Costo: $20.000 por persona</p></div>
+    <div class="ph"><h1>Pagos &amp; Cuotas</h1><p id="pagos-sub"></p></div>
     <div class="g2 mb">
       <div class="card">
-        <div class="ch"><div><div class="ct">Resumen financiero</div></div></div>
-        <div class="pr"><span class="prn">Total esperado</span><span class="pra" id="pag-total-esp">$560.000</span></div>
-        <div class="pr"><span class="prn">Cobrado</span><span class="pra" style="color:var(--ok)" id="pag-cobrado">$427.000</span></div>
-        <div class="pr"><span class="prn">Pendiente</span><span class="pra" style="color:var(--er)" id="pag-pendiente">$133.000</span></div>
-        <div class="div"></div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:11px;color:var(--t3)">Progreso</span><span style="font-size:11px;font-weight:600" id="pag-pct-label">76%</span></div>
-        <div class="pb"><div class="pf pf-ok" id="pag-pf" style="width:76%"></div></div>
+        <div class="ct">Resumen financiero</div>
+        <div id="pagos-resumen"></div>
+        <div style="margin-top:8px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;color:var(--t3)">Progreso</span><span style="font-size:11px;font-weight:600" id="pagos-pct">0%</span></div>
+          <div class="pb"><div class="pf" id="pagos-prog" style="width:0%"></div></div>
+        </div>
       </div>
       <div class="card">
-        <div class="ch"><div class="ct">Acciones</div></div>
+        <div class="ct">Acciones rápidas</div>
         <div style="display:flex;flex-direction:column;gap:7px">
-          <button class="btn bp bsm" onclick="toast('Recordatorio enviado a 9 participantes ✓','ok')">📱 Enviar recordatorio de pago</button>
-          <button class="btn bs bsm" onclick="toast('Lista exportada ✓','ok')">📄 Exportar deudores</button>
-          <button class="btn bs bsm" onclick="openM('m-pago')">💵 Registrar pago manual</button>
+          <button class="btn bp bsm" onclick="toast('Recordatorio enviado ✓','ok')" style="background:var(--rm)">📱 Enviar recordatorio a deudores</button>
+          <button class="btn bs bsm" onclick="exportCSV()">📄 Exportar lista CSV</button>
+          <button class="btn bs bsm" onclick="openM('m-np')">＋ Agregar participante</button>
         </div>
       </div>
     </div>
-    <div class="tw"><table class="tbl"><thead><tr><th>Participante</th><th>Total</th><th>Abonado</th><th>Resta</th><th>Estado</th><th>Últ. pago</th><th></th></tr></thead><tbody id="pagtb"></tbody></table></div>
+    <div class="tw"><table class="xtbl"><thead id="pagos-thead"></thead><tbody id="pagos-tbody"></tbody></table></div>
   </div>
 
-  <!-- ══ SALUD ══════════════════════════════════════════════════ -->
+  <!-- ═══ SALUD ══════════════════════════════════════════════════ -->
   <div class="pag pc" id="p-salud">
-    <div class="ph"><h1>Salud &amp; Dietas</h1><p>Información médica confidencial de los participantes</p></div>
-    <div class="al ae mb"><span class="al-i">⚠️</span><strong>Información confidencial.</strong>&nbsp;Uso exclusivo del equipo de salud y coordinación. No compartir sin autorización.</div>
-    <div class="g2 mb">
-      <div class="card"><div class="ch"><div><div class="ct">💊 Medicamentos</div><div class="cs" id="salud-med-cs">7 participantes con medicación</div></div></div><div id="meds-lst"></div></div>
-      <div class="card"><div class="ch"><div><div class="ct">🥗 Dietas especiales</div><div class="cs" id="salud-diet-cs">5 participantes con restricciones</div></div></div><div id="diet-lst"></div></div>
+    <div class="ph"><h1>Salud &amp; Dietas</h1><p>Información médica confidencial del retiro</p></div>
+    <div class="al ae mb"><span>⚠️</span><strong>Confidencial.</strong>&nbsp;Solo equipo de salud y coordinación.</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <div class="ft">
+        <button class="ftb on" onclick="setSaludFilter(this,'')">Todos</button>
+        <button class="ftb" onclick="setSaludFilter(this,'med')">Con medicación</button>
+        <button class="ftb" onclick="setSaludFilter(this,'diet')">Con dieta</button>
+        <button class="ftb" onclick="setSaludFilter(this,'alerg')">Con alergias</button>
+        <button class="ftb" onclick="setSaludFilter(this,'cond')">Con condición</button>
+      </div>
     </div>
-    <div class="card"><div class="ch"><div><div class="ct">⚕️ Alergias &amp; condiciones</div></div></div><div id="aler-lst"></div></div>
+    <div class="tw"><table class="xtbl"><thead id="salud-thead"></thead><tbody id="salud-tbody"></tbody></table></div>
   </div>
 
-  <!-- ══ ALOJAMIENTO ════════════════════════════════════════════ -->
+  <!-- ═══ ALOJAMIENTO ════════════════════════════════════════════ -->
   <div class="pag pc" id="p-aloj">
     <div class="ph"><h1>Alojamiento</h1><p>Distribución de habitaciones y estadía</p></div>
-    <div class="sg mb">
-      <div class="sc s-ok"><div class="sc-i">🛏</div><div class="sc-v">22</div><div class="sc-l">Se quedan</div></div>
-      <div class="sc s-wn"><div class="sc-i">☀️</div><div class="sc-v">4</div><div class="sc-l">Solo día</div></div>
-      <div class="sc s-er"><div class="sc-i">🚪</div><div class="sc-v">2</div><div class="sc-l">Se van antes</div></div>
-      <div class="sc s-bl"><div class="sc-i">🏠</div><div class="sc-v">5</div><div class="sc-l">Habitaciones</div></div>
-    </div>
+    <div class="kg kg4 mb" id="aloj-kpis"></div>
     <div class="g2">
+      <div class="tw"><table class="xtbl"><thead id="aloj-thead"></thead><tbody id="aloj-tbody"></tbody></table></div>
       <div>
-        <div class="card mb">
-          <div class="ch"><div><div class="ct">Habitaciones</div></div><button class="ca" onclick="openM('m-hab')">＋ Agregar</button></div>
-          <div id="hab-lst"></div>
-        </div>
-      </div>
-      <div>
-        <div class="card mb">
-          <div class="ch"><div><div class="ct">Se van antes del cierre</div></div></div>
-          <div class="om"><div class="av" style="background:#B8972A;width:26px;height:26px;font-size:9px">LR</div><span style="font-size:12px">Lucas Rodríguez</span><span class="or">Dom 10:00 am</span></div>
-          <div class="om"><div class="av" style="background:#5C4A2A;width:26px;height:26px;font-size:9px">AT</div><span style="font-size:12px">Ana Torres</span><span class="or">Dom 11:00 am</span></div>
-          <div class="al ai" style="margin-top:9px"><span class="al-i">ℹ️</span>Coordinar desayuno temprano y transporte.</div>
-        </div>
-        <div class="card">
-          <div class="ch"><div class="ct">Solo asisten de día</div></div>
-          <div class="om"><div class="av" style="background:#2D7A4F;width:26px;height:26px;font-size:9px">CM</div><span style="font-size:12px">Carlos Mendoza</span><span class="or">Sáb + Dom</span></div>
-          <div class="om"><div class="av" style="background:#B8972A;width:26px;height:26px;font-size:9px">SV</div><span style="font-size:12px">Sofía Vega</span><span class="or">Solo Sábado</span></div>
-          <div class="om"><div class="av" style="background:#9B2335;width:26px;height:26px;font-size:9px">DF</div><span style="font-size:12px">Diego Fernández</span><span class="or">Sáb + Dom</span></div>
-          <div class="om"><div class="av" style="background:#1E5C8B;width:26px;height:26px;font-size:9px">PR</div><span style="font-size:12px">Paula Ríos</span><span class="or">Solo Domingo</span></div>
-        </div>
+        <div class="card mb"><div class="ct">🚌 Se van antes del cierre</div><div id="aloj-antes"></div></div>
+        <div class="card"><div class="ct">☀️ Solo asisten de día</div><div id="aloj-dia"></div></div>
       </div>
     </div>
   </div>
 
-  <!-- ══ ORGANIGRAMA ════════════════════════════════════════════ -->
+  <!-- ═══ ORGANIGRAMA ════════════════════════════════════════════ -->
   <div class="pag pc" id="p-org">
-    <div class="ph"><h1>Organigrama de Servicio</h1><p>Distribución de tareas — a quién le toca qué</p></div>
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
-      <div class="ft">
-        <button class="ftb on" onclick="fTab(this,'todos-org')">Todos</button>
-        <button class="ftb" onclick="fTab(this,'org-lun')">Lunes</button>
-        <button class="ftb" onclick="fTab(this,'org-mar')">Martes</button>
-        <button class="ftb" onclick="fTab(this,'org-mie')">Miércoles</button>
-        <button class="ftb" onclick="fTab(this,'org-jue')">Jueves</button>
-        <button class="ftb" onclick="fTab(this,'org-vie')">Viernes</button>
-        <button class="ftb" onclick="fTab(this,'org-sab')">Sábado</button>
-        <button class="ftb" onclick="fTab(this,'org-dom')">Domingo</button>
-      </div>
-      <button class="btn bp bsm" onclick="reasignar()">🔀 Reasignar aleatoriamente</button>
+    <div class="ph"><h1>Organigrama de Servicio</h1><p>Distribución de tareas — editable</p></div>
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <button class="btn bp bsm" onclick="reasignar()" style="background:var(--rm)">🔀 Reasignar aleatoriamente</button>
+      <button class="btn bs bsm" onclick="toast('Asignaciones guardadas ✓','ok')">💾 Guardar asignaciones</button>
     </div>
     <div class="og" id="org-grid"></div>
   </div>
 
-  <!-- ══ COMIDAS ════════════════════════════════════════════════ -->
-  <div class="pag pc" id="p-comidas">
-    <div class="ph"><h1>Planificación de Comidas</h1><p>Menú, cantidades y platos especiales</p></div>
-    <div class="sg mb">
-      <div class="sc s-go"><div class="sc-i">🍽</div><div class="sc-v">11</div><div class="sc-l">Comidas totales</div></div>
-      <div class="sc s-ok"><div class="sc-i">👥</div><div class="sc-v">28</div><div class="sc-l">Porciones prom.</div></div>
-      <div class="sc s-wn"><div class="sc-i">🥗</div><div class="sc-v">5</div><div class="sc-l">Platos especiales</div></div>
-      <div class="sc s-bl"><div class="sc-i">🛒</div><div class="sc-v">3</div><div class="sc-l">Compras pendientes</div></div>
-    </div>
-    <div id="comidas-plan"></div>
-  </div>
-
-  <!-- ══ PROGRAMA ═══════════════════════════════════════════════ -->
-  <div class="pag pc" id="p-programa">
+  <!-- ═══ PROGRAMA ═══════════════════════════════════════════════ -->
+  <div class="pag pc" id="p-prog">
     <div class="ph"><h1>Programa del Retiro</h1><p>Cronograma completo de actividades</p></div>
-    <div class="ft mb">
+    <div class="ft">
       <button class="ftb on" id="pt-v" onclick="showProg('vie',this)">Viernes</button>
       <button class="ftb" id="pt-s" onclick="showProg('sab',this)">Sábado</button>
       <button class="ftb" id="pt-d" onclick="showProg('dom',this)">Domingo</button>
     </div>
     <div class="g2">
-      <div class="sch" id="prog-sch"></div>
-      <div>
-        <div class="card mb">
-          <div class="ch"><div class="ct">Predicadores &amp; Talleristas</div></div>
-          <div class="om"><div class="av" style="background:#B8972A;width:26px;height:26px;font-size:9px">PJ</div><span style="font-size:12px">Pastor Juan Díaz</span><span class="or">Mensaje central</span></div>
-          <div class="om"><div class="av" style="background:#2D7A4F;width:26px;height:26px;font-size:9px">DM</div><span style="font-size:12px">Diác. María Castro</span><span class="or">Taller oración</span></div>
-          <div class="om"><div class="av" style="background:#1E5C8B;width:26px;height:26px;font-size:9px">HL</div><span style="font-size:12px">Hno. Luis Vera</span><span class="or">Alabanza</span></div>
+      <div id="prog-sch"></div>
+      <div class="card">
+        <div class="ct" style="justify-content:space-between">Equipo ministerial
+          <button class="btn bs bsm" onclick="addMinisterial()" style="font-size:10px;padding:3px 9px">＋ Agregar</button>
         </div>
-        <div class="card">
-          <div class="ch"><div class="ct">Versículo del retiro</div></div>
-          <div style="background:var(--cr);border-radius:var(--rs);padding:14px;text-align:center;border:1px solid var(--bdl)">
-            <div style="font-size:20px;margin-bottom:7px">✞</div>
-            <div style="font-family:var(--f);font-size:13px;font-style:italic;color:var(--brl);line-height:1.7">"Venid a mí todos los que estáis trabajados y cargados, y yo os haré descansar."</div>
-            <div style="font-size:10px;color:var(--t3);margin-top:7px;text-transform:uppercase;letter-spacing:1px">Mateo 11:28</div>
-          </div>
-        </div>
+        <div id="prog-ministerial"></div>
       </div>
     </div>
   </div>
 
-  <!-- ══ ALERTAS ════════════════════════════════════════════════ -->
-  <div class="pag pc" id="p-alertas">
-    <div class="ph"><h1>Centro de Alertas</h1><p>4 alertas activas que requieren atención</p></div>
-    <div id="alert-lst"></div>
+  <!-- ═══ ÍNDICE GENERAL ══════════════════════════════════════════ -->
+  <div class="pag pc" id="p-index">
+    <div style="background:#1A1208;border-radius:var(--r);padding:20px 24px;margin-bottom:18px;text-align:center">
+      <div style="font-size:22px;margin-bottom:6px;opacity:.6">✞</div>
+      <div style="font-family:var(--f);font-size:22px;font-weight:700;color:#E8C96A">GESTIÓN DE RETIROS ESPIRITUALES</div>
+      <div style="font-size:11px;color:rgba(250,247,242,.55);margin-top:4px">Sistema de administración multi-retiro · Backup Solutions · Salta, Argentina</div>
+    </div>
+    <div class="kg kg5 mb" id="index-kpis"></div>
+    <div class="tw"><table class="xtbl" id="index-tbl">
+      <thead><tr>
+        <th class="tl" style="min-width:200px">Retiro</th>
+        <th style="min-width:90px">Tipo</th>
+        <th style="min-width:100px">Estado</th>
+        <th>Inscriptos</th><th>Cupo</th><th>Pagados</th>
+        <th style="min-width:120px">% Recaudado</th>
+        <th style="min-width:110px">Esperado</th>
+        <th style="min-width:110px">Cobrado</th>
+        <th style="min-width:110px">Pendiente</th>
+        <th style="width:60px"></th>
+      </tr></thead>
+      <tbody id="index-tbody"></tbody>
+    </table></div>
   </div>
 
-  <!-- ══ MIS RETIROS ════════════════════════════════════════════ -->
-  <div class="pag pc" id="p-retiros">
-    <div class="ph"><h1>Mis Retiros</h1><p>Historial y retiros planificados</p></div>
-    <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
-      <button class="btn bp bsm" onclick="openM('m-ret')">＋ Nuevo retiro</button>
-    </div>
-    <div id="ret-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:13px"></div>
+  <!-- ═══ COMPARATIVO ════════════════════════════════════════════ -->
+  <div class="pag pc" id="p-comp">
+    <div class="ph"><h1>Comparativo Global</h1><p>Todos los retiros lado a lado</p></div>
+    <div class="tw"><table class="xtbl" id="comp-tbl">
+      <thead><tr>
+        <th class="tl" style="min-width:200px">Retiro</th>
+        <th>Estado</th><th>Inscrip.</th><th>Cupo</th>
+        <th style="min-width:120px">% Recaudado</th>
+        <th style="min-width:110px">Esperado</th>
+        <th style="min-width:110px">Cobrado</th>
+        <th style="min-width:110px">Pendiente</th>
+      </tr></thead>
+      <tbody id="comp-tbody"></tbody>
+    </table></div>
   </div>
 </main>
 
-<!-- ═══════════════ MODALES ══════════════════════════════════════ -->
-
-<!-- Nuevo participante -->
-<div class="mo" id="m-np" onclick="ovC(event,'m-np')">
-  <div class="modal" style="max-width:640px">
-    <div class="mh"><div class="mt">✞ Nuevo participante</div><button class="mx" onclick="closeM('m-np')">✕</button></div>
+<!-- ═══ MODAL NUEVO PARTICIPANTE ═══════════════════════════════════ -->
+<div class="mo" id="m-np" onclick="if(event.target.id==='m-np')closeM('m-np')">
+  <div class="modal" style="max-width:620px">
+    <div class="mh"><div class="mt" id="np-title">✞ Nuevo participante</div><button class="mx" onclick="closeM('m-np')">✕</button></div>
     <div class="orn"><span>Datos personales</span></div>
-    <div class="fr"><div class="fg"><label class="fl">Nombre *</label><input class="fi" id="np-n" placeholder="Nombre completo"></div><div class="fg"><label class="fl">Celular *</label><input class="fi" id="np-c" placeholder="+54 9 ..."></div></div>
-    <div class="fr"><div class="fg"><label class="fl">Email</label><input class="fi" type="email" placeholder="correo@ejemplo.com"></div><div class="fg"><label class="fl">Edad</label><input class="fi" type="number" placeholder="Años" min="8" max="99"></div></div>
-    <div class="fr"><div class="fg"><label class="fl">Iglesia / Comunidad</label><input class="fi" placeholder="Nombre de la iglesia"></div><div class="fg"><label class="fl">Contacto emergencia</label><input class="fi" placeholder="Nombre y celular"></div></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Nombre *</label><input class="fi" id="np-n" placeholder="Nombre completo"></div>
+      <div class="fg"><label class="fl">Celular</label><input class="fi" id="np-c" placeholder="+54 9 ..."></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Iglesia</label><input class="fi" id="np-ig" placeholder="Nombre de la iglesia"></div>
+      <div class="fg"><label class="fl">Edad</label><input class="fi" id="np-ed" type="number" placeholder="0" min="8" max="99"></div>
+    </div>
     <div class="orn"><span>Pago &amp; Alojamiento</span></div>
     <div class="fr3">
-      <div class="fg"><label class="fl">Estado de pago</label><select class="fi" id="np-pg"><option value="nopay">Sin abonar</option><option value="partial">Parcial</option><option value="paid">Pagado completo</option></select></div>
-      <div class="fg"><label class="fl">Monto abonado ($)</label><input class="fi" id="np-m" type="number" placeholder="0"></div>
-      <div class="fg"><label class="fl">Alojamiento</label><select class="fi" id="np-al"><option value="duerme">Duerme</option><option value="dia">Solo día</option><option value="antes">Se va antes</option></select></div>
+      <div class="fg"><label class="fl">Estado pago</label><select class="fi" id="np-pg"><option>Sin pagar</option><option>Parcial</option><option>Pagado</option></select></div>
+      <div class="fg"><label class="fl">Abonado ($)</label><input class="fi" id="np-ab" type="number" placeholder="0"></div>
+      <div class="fg"><label class="fl">Alojamiento</label><select class="fi" id="np-al"><option>Duerme</option><option>Solo día</option><option>Se va antes</option></select></div>
     </div>
     <div class="orn"><span>Salud</span></div>
-    <div class="fg"><label class="fl">Medicamentos (nombre · dosis · horario)</label><textarea class="fi" rows="2" placeholder="ej: Metformina 500mg — desayuno y cena"></textarea></div>
+    <div class="fg"><label class="fl">Medicamentos (nombre · dosis · horario)</label><textarea class="fi" id="np-me" rows="2" placeholder="ej: Metformina 500mg — desayuno y cena"></textarea></div>
     <div class="fr">
-      <div class="fg"><label class="fl">Dieta especial</label><select class="fi"><option value="">Sin restricción</option><option>Sin gluten (celíaco)</option><option>Sin lactosa</option><option>Vegetariano</option><option>Vegano</option><option>Diabético</option><option>Hiposódico</option><option>Otra</option></select></div>
-      <div class="fg"><label class="fl">Alergias conocidas</label><input class="fi" placeholder="ej: maní, ibuprofeno..."></div>
+      <div class="fg"><label class="fl">Dieta especial</label><select class="fi" id="np-di"><option value="">Sin restricción</option><option>Sin gluten</option><option>Sin lactosa</option><option>Vegetariano</option><option>Vegano</option><option>Diabético</option><option>Hiposódico</option><option>Otra</option></select></div>
+      <div class="fg"><label class="fl">Alergias</label><input class="fi" id="np-ae" placeholder="ej: maní, ibuprofeno..."></div>
     </div>
-    <div class="fg"><label class="fl">Condición médica relevante</label><input class="fi" placeholder="ej: diabetes, hipertensión, epilepsia..."></div>
-    <div class="orn"><span>Observaciones</span></div>
-    <div class="fg"><label class="fl">Notas</label><textarea class="fi" rows="2" placeholder="Cualquier info relevante para el equipo..."></textarea></div>
-    <div class="fa"><button class="btn bs" onclick="closeM('m-np')">Cancelar</button><button class="btn bp" onclick="addPart()">✞ Inscribir participante</button></div>
+    <div class="fg"><label class="fl">Condición médica</label><input class="fi" id="np-ko" placeholder="ej: diabetes, hipertensión..."></div>
+    <div class="fg"><label class="fl">Notas</label><textarea class="fi" id="np-no" rows="2"></textarea></div>
+    <div class="fa"><button class="btn bs" onclick="closeM('m-np')">Cancelar</button><button class="btn bp" id="np-btn" onclick="addPart()" style="background:var(--rm)">✞ Inscribir</button></div>
   </div>
 </div>
 
-<!-- Ver participante -->
-<div class="mo" id="m-vp" onclick="ovC(event,'m-vp')">
-  <div class="modal">
-    <div class="mh"><div class="mt" id="vp-t">Participante</div><button class="mx" onclick="closeM('m-vp')">✕</button></div>
-    <div id="vp-c"></div>
-    <div class="fa"><button class="btn bd2 bsm" onclick="closeM('m-vp');toast('Participante eliminado','er')">Eliminar</button><button class="btn bs" onclick="closeM('m-vp')">Cerrar</button><button class="btn bp" onclick="closeM('m-vp');toast('Cambios guardados ✓','ok')">Guardar</button></div>
-  </div>
-</div>
-
-<!-- Registrar pago -->
-<div class="mo" id="m-pago" onclick="ovC(event,'m-pago')">
-  <div class="modal" style="max-width:420px">
-    <div class="mh"><div class="mt">💵 Registrar pago</div><button class="mx" onclick="closeM('m-pago')">✕</button></div>
-    <div class="fg"><label class="fl">Participante</label><select class="fi"><option>-- Seleccionar --</option></select></div>
-    <div class="fr"><div class="fg"><label class="fl">Monto ($)</label><input class="fi" type="number" placeholder="0"></div><div class="fg"><label class="fl">Forma</label><select class="fi"><option>Efectivo</option><option>Transferencia</option><option>Mercado Pago</option></select></div></div>
-    <div class="fg"><label class="fl">Fecha</label><input class="fi" type="date"></div>
-    <div class="fg"><label class="fl">Comprobante / Notas</label><input class="fi" placeholder="N° transferencia, obs..."></div>
-    <div class="fa"><button class="btn bs" onclick="closeM('m-pago')">Cancelar</button><button class="btn bp" onclick="closeM('m-pago');toast('Pago registrado ✓','ok')">Registrar</button></div>
-  </div>
-</div>
-
-<!-- Nuevo retiro -->
-<div class="mo" id="m-ret" onclick="ovC(event,'m-ret')">
+<!-- ═══ MODAL EDITAR RETIRO ════════════════════════════════════════ -->
+<div class="mo" id="m-ret" onclick="if(event.target.id==='m-ret')closeM('m-ret')">
   <div class="modal" style="max-width:500px">
-    <div class="mh"><div class="mt">✞ Nuevo retiro espiritual</div><button class="mx" onclick="closeM('m-ret')">✕</button></div>
-    <div class="fg"><label class="fl">Nombre del retiro *</label><input class="fi" id="nr-n" placeholder="ej: Retiro Jóvenes 2025"></div>
-    <div class="fr"><div class="fg"><label class="fl">Fecha inicio *</label><input class="fi" id="nr-fi" type="date"></div><div class="fg"><label class="fl">Fecha fin *</label><input class="fi" id="nr-ff" type="date"></div></div>
-    <div class="fg"><label class="fl">Lugar</label><input class="fi" id="nr-l" placeholder="Casa de Retiros..."></div>
-    <div class="fr"><div class="fg"><label class="fl">Costo por persona ($)</label><input class="fi" id="nr-c" type="number" placeholder="0"></div><div class="fg"><label class="fl">Cupo máximo</label><input class="fi" id="nr-q" type="number" placeholder="0"></div></div>
-    <div class="fg"><label class="fl">Versículo central</label><input class="fi" id="nr-v" placeholder="ej: Juan 3:16"></div>
-    <div class="fg"><label class="fl">Tema / Descripción</label><textarea class="fi" id="nr-d" rows="2" placeholder="Tema y objetivo del retiro..."></textarea></div>
-    <div class="fa"><button class="btn bs" onclick="closeM('m-ret')">Cancelar</button><button class="btn bp" onclick="addRetiro()">✞ Crear retiro</button></div>
-  </div>
-</div>
-
-<!-- Editar retiro -->
-<div class="mo" id="m-edit-ret" onclick="ovC(event,'m-edit-ret')">
-  <div class="modal" style="max-width:500px">
-    <div class="mh"><div class="mt">✏️ Editar retiro</div><button class="mx" onclick="closeM('m-edit-ret')">✕</button></div>
+    <div class="mh"><div class="mt">✏️ Editar retiro</div><button class="mx" onclick="closeM('m-ret')">✕</button></div>
     <div class="fg"><label class="fl">Nombre del retiro *</label><input class="fi" id="er-n"></div>
-    <div class="fr"><div class="fg"><label class="fl">Fecha inicio</label><input class="fi" id="er-fi" type="date"></div><div class="fg"><label class="fl">Fecha fin</label><input class="fi" id="er-ff" type="date"></div></div>
-    <div class="fg"><label class="fl">Lugar</label><input class="fi" id="er-l"></div>
+    <div class="fr"><div class="fg"><label class="fl">Fechas</label><input class="fi" id="er-f" placeholder="ej: 12–14 Sep 2025"></div><div class="fg"><label class="fl">Lugar</label><input class="fi" id="er-l"></div></div>
     <div class="fr"><div class="fg"><label class="fl">Costo por persona ($)</label><input class="fi" id="er-c" type="number"></div><div class="fg"><label class="fl">Cupo máximo</label><input class="fi" id="er-q" type="number"></div></div>
     <div class="fg"><label class="fl">Versículo central</label><input class="fi" id="er-v"></div>
-    <div class="fg"><label class="fl">Tema / Descripción</label><textarea class="fi" id="er-d" rows="2"></textarea></div>
-    <div class="fa"><button class="btn bs" onclick="closeM('m-edit-ret')">Cancelar</button><button class="btn bp" onclick="guardarEditRetiro()">Guardar cambios</button></div>
-  </div>
-</div>
-
-<!-- Nueva habitación -->
-<div class="mo" id="m-hab" onclick="ovC(event,'m-hab')">
-  <div class="modal" style="max-width:400px">
-    <div class="mh"><div class="mt">🛏 Nueva habitación</div><button class="mx" onclick="closeM('m-hab')">✕</button></div>
-    <div class="fr"><div class="fg"><label class="fl">Nombre</label><input class="fi" placeholder="ej: Hab. Mujeres A"></div><div class="fg"><label class="fl">Capacidad</label><input class="fi" type="number" placeholder="0"></div></div>
-    <div class="fg"><label class="fl">Tipo</label><select class="fi"><option>Solo mujeres</option><option>Solo hombres</option><option>Mixta</option><option>Familia</option><option>Líderes</option></select></div>
-    <div class="fa"><button class="btn bs" onclick="closeM('m-hab')">Cancelar</button><button class="btn bp" onclick="closeM('m-hab');toast('Habitación agregada ✓','ok')">Guardar</button></div>
+    <div class="fg"><label class="fl">Tema</label><input class="fi" id="er-t"></div>
+    <div class="fg"><label class="fl">Estado</label><select class="fi" id="er-e"><option>Activo</option><option>Planificando</option><option>Finalizado</option></select></div>
+    <div class="fa"><button class="btn bs" onclick="closeM('m-ret')">Cancelar</button><button class="btn bp" onclick="saveRetiro()" style="background:var(--rm)">Guardar cambios</button></div>
   </div>
 </div>
 
 <div id="ta"></div>
-<div id="sb-ov" style="display:none;position:fixed;inset:0;background:rgba(30,20,8,.4);z-index:99" onclick="tglSb()"></div>
+<div id="sb-ov" style="display:none;position:fixed;inset:0;background:rgba(20,14,4,.4);z-index:99" onclick="document.getElementById('sb').classList.remove('on');this.style.display='none'"></div>
 
 <script>
 'use strict'
-// ═══ DATA ════════════════════════════════════════════════════════
 
-// Datos de participantes del retiro activo (retiro 0 = Jóvenes 2025)
-const PD_DEMO=[
-  {id:1,nombre:'María González',cel:'+54 9 387 123-4567',iglesia:'Iglesia Vida Nueva',edad:24,pago:'paid',abonado:20000,total:20000,aloj:'duerme',meds:'Insulina 10U — desayuno, almuerzo y cena',dieta:'Diabético',alergias:'',cond:'Diabetes tipo 1',notas:'Requiere refrigerador para insulina'},
-  {id:2,nombre:'Lucas Rodríguez',cel:'+54 9 387 234-5678',iglesia:'Iglesia Emanuel',edad:22,pago:'paid',abonado:20000,total:20000,aloj:'antes',meds:'',dieta:'',alergias:'',cond:'',notas:'Se va el domingo a las 10am'},
-  {id:3,nombre:'Ana Torres',cel:'+54 9 387 345-6789',iglesia:'Iglesia Vida Nueva',edad:19,pago:'partial',abonado:10000,total:20000,aloj:'antes',meds:'',dieta:'Sin gluten (celíaco)',alergias:'Gluten',cond:'Celiaquía',notas:'Se va el domingo a las 11am'},
-  {id:4,nombre:'José Pérez',cel:'+54 9 387 456-7890',iglesia:'Comunidad Fe',edad:28,pago:'partial',abonado:16000,total:20000,aloj:'dia',meds:'Omeprazol 20mg — antes del desayuno',dieta:'',alergias:'',cond:'Gastritis',notas:''},
-  {id:5,nombre:'Elena Martínez',cel:'+54 9 387 567-8901',iglesia:'Iglesia Gracia',edad:31,pago:'nopay',abonado:0,total:20000,aloj:'duerme',meds:'Sertralina 50mg — mañana. Alprazolam 0.5mg — noche',dieta:'',alergias:'',cond:'Ansiedad',notas:'Medicación psiquiátrica. Máxima discreción.'},
-  {id:6,nombre:'Sofía Vega',cel:'+54 9 387 678-9012',iglesia:'Iglesia Emanuel',edad:17,pago:'paid',abonado:20000,total:20000,aloj:'dia',meds:'',dieta:'Vegetariano',alergias:'Maní',cond:'',notas:'Menor de edad — autorización firmada'},
-  {id:7,nombre:'Carlos Mendoza',cel:'+54 9 387 789-0123',iglesia:'Comunidad Fe',edad:35,pago:'paid',abonado:20000,total:20000,aloj:'dia',meds:'Enalapril 10mg — noche. Aspirina 100mg — noche',dieta:'Hiposódico',alergias:'',cond:'Hipertensión',notas:''},
-  {id:8,nombre:'Paula Ríos',cel:'+54 9 387 890-1234',iglesia:'Iglesia Gracia',edad:26,pago:'nopay',abonado:0,total:20000,aloj:'dia',meds:'',dieta:'',alergias:'Ibuprofeno',cond:'',notas:'Alergia a antiinflamatorios'},
-  {id:9,nombre:'Diego Fernández',cel:'+54 9 387 901-2345',iglesia:'Iglesia Vida Nueva',edad:20,pago:'partial',abonado:5000,total:20000,aloj:'duerme',meds:'',dieta:'Sin lactosa',alergias:'Lactosa',cond:'Intolerancia lactosa',notas:''},
-  {id:10,nombre:'Laura Sánchez',cel:'+54 9 387 012-3456',iglesia:'Iglesia Emanuel',edad:23,pago:'paid',abonado:20000,total:20000,aloj:'duerme',meds:'Tiroxina 50mcg — ayunas',dieta:'',alergias:'',cond:'Hipotiroidismo',notas:'Medicación 30 min antes del desayuno'},
-  {id:11,nombre:'Martín López',cel:'+54 9 387 111-2222',iglesia:'Comunidad Fe',edad:29,pago:'paid',abonado:20000,total:20000,aloj:'duerme',meds:'',dieta:'',alergias:'',cond:'',notas:''},
-  {id:12,nombre:'Valentina Cruz',cel:'+54 9 387 222-3333',iglesia:'Iglesia Vida Nueva',edad:21,pago:'nopay',abonado:0,total:20000,aloj:'duerme',meds:'',dieta:'Vegano',alergias:'',cond:'',notas:''},
-]
-const extras=['Roberto García','Patricia Lima','Fernando Ruiz','Natalia Castro','Eduardo Flores','Daniela Herrera','Andrés Morales','Claudia Jiménez','Ramón Torres','Beatriz Núñez','Hugo Silva','Carmen Gómez','Ignacio Romero','Mariana Díaz','Tomás Ortiz','Lucía Vargas']
-extras.forEach((nombre,i)=>{
-  const id=13+i
-  PD_DEMO.push({id,nombre,cel:`+54 9 387 ${String(id).padStart(3,'0')}-${String(id*7).padStart(4,'0')}`,
-    iglesia:['Iglesia Vida Nueva','Iglesia Emanuel','Comunidad Fe','Iglesia Gracia'][id%4],
-    edad:18+id%20,pago:id%3===0?'nopay':id%3===1?'paid':'partial',
-    abonado:id%3===0?0:id%3===1?20000:12000,total:20000,
-    aloj:id%6===0?'dia':'duerme',meds:'',dieta:'',alergias:'',cond:'',notas:''})
-})
+// ════════════════════════════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════════════════════════════
+let RETIROS = [{"nombre": "Retiro Jóvenes 2025", "fechas": "12–14 Sep 2025", "lugar": "Casa de Retiros La Paz · Salta", "costo": 20000, "cupo": 35, "versiculo": "Mateo 11:28", "tema": "Renovación espiritual para jóvenes", "estado": "Activo", "icono": "🌿", "cs": {"main": "1B5E35", "med": "2E7D4F", "accent": "3DAA6A", "light": "D4EDDA", "xlight": "EBF7EE", "bg": "F4FBF6", "htxt": "FFFFFF", "ctxt": "1B4028"}, "id": "R1", "participantes": [{"id": 1, "n": "María González", "c": "+54 9 387 123-4567", "ig": "Iglesia Vida Nueva", "ed": 24, "pg": "Pagado", "ab": 20000, "to": 20000, "al": "Duerme", "me": "Insulina 10U — desayuno, almuerzo, cena", "di": "Diabético", "ko": "Diabetes tipo 1", "no": "Requiere refrigerador"}, {"id": 2, "n": "Lucas Rodríguez", "c": "+54 9 387 234-5678", "ig": "Iglesia Emanuel", "ed": 22, "pg": "Pagado", "ab": 20000, "to": 20000, "al": "Se va antes", "me": "", "di": "", "ko": "", "no": "Sale dom 10am"}, {"id": 3, "n": "Ana Torres", "c": "+54 9 387 345-6789", "ig": "Iglesia Vida Nueva", "ed": 19, "pg": "Parcial", "ab": 10000, "to": 20000, "al": "Se va antes", "me": "", "di": "Sin gluten", "ko": "Celiaquía", "no": "Sale dom 11am"}, {"id": 4, "n": "José Pérez", "c": "+54 9 387 456-7890", "ig": "Comunidad Fe", "ed": 28, "pg": "Parcial", "ab": 16000, "to": 20000, "al": "Solo día", "me": "Omeprazol 20mg — antes del desayuno", "di": "", "ko": "Gastritis", "no": ""}, {"id": 5, "n": "Elena Martínez", "c": "+54 9 387 567-8901", "ig": "Iglesia Gracia", "ed": 31, "pg": "Sin pagar", "ab": 0, "to": 20000, "al": "Duerme", "me": "Sertralina 50mg mañana; Alprazolam 0.5mg noche", "di": "", "ko": "Ansiedad", "no": "Confidencial"}, {"id": 6, "n": "Sofía Vega", "c": "+54 9 387 678-9012", "ig": "Iglesia Emanuel", "ed": 17, "pg": "Pagado", "ab": 20000, "to": 20000, "al": "Solo día", "me": "", "di": "Vegetariano", "ko": "", "no": "Menor de edad"}, {"id": 7, "n": "Carlos Mendoza", "c": "+54 9 387 789-0123", "ig": "Comunidad Fe", "ed": 35, "pg": "Pagado", "ab": 20000, "to": 20000, "al": "Solo día", "me": "Enalapril 10mg + Aspirina 100mg noche", "di": "Hiposódico", "ko": "Hipertensión", "no": ""}, {"id": 8, "n": "Paula Ríos", "c": "+54 9 387 890-1234", "ig": "Iglesia Gracia", "ed": 26, "pg": "Sin pagar", "ab": 0, "to": 20000, "al": "Solo día", "me": "", "di": "", "ko": "Alergia Ibuprofeno", "no": ""}, {"id": 9, "n": "Diego Fernández", "c": "+54 9 387 901-2345", "ig": "Iglesia Vida Nueva", "ed": 20, "pg": "Parcial", "ab": 5000, "to": 20000, "al": "Duerme", "me": "", "di": "Sin lactosa", "ko": "Intolerancia lactosa", "no": ""}, {"id": 10, "n": "Laura Sánchez", "c": "+54 9 387 012-3456", "ig": "Iglesia Emanuel", "ed": 23, "pg": "Pagado", "ab": 20000, "to": 20000, "al": "Duerme", "me": "Tiroxina 50mcg — ayunas", "di": "", "ko": "Hipotiroidismo", "no": ""}, {"id": 11, "n": "Martín López", "c": "+54 9 387 111-2222", "ig": "Comunidad Fe", "ed": 29, "pg": "Pagado", "ab": 20000, "to": 20000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 12, "n": "Valentina Cruz", "c": "+54 9 387 222-3333", "ig": "Iglesia Vida Nueva", "ed": 21, "pg": "Sin pagar", "ab": 0, "to": 20000, "al": "Duerme", "me": "", "di": "Vegano", "ko": "", "no": ""}, {"id": 13, "n": "Roberto García", "c": "+54 9 387 013-0091", "ig": "Iglesia Emanuel", "ed": 25, "pg": "Pagado", "ab": 20000, "to": 20000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 14, "n": "Patricia Lima", "c": "+54 9 387 014-0098", "ig": "Comunidad Fe", "ed": 33, "pg": "Parcial", "ab": 12000, "to": 20000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 15, "n": "Fernando Ruiz", "c": "+54 9 387 015-0105", "ig": "Iglesia Gracia", "ed": 27, "pg": "Pagado", "ab": 20000, "to": 20000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 16, "n": "Natalia Castro", "c": "+54 9 387 016-0112", "ig": "Iglesia Vida Nueva", "ed": 22, "pg": "Pagado", "ab": 20000, "to": 20000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 17, "n": "Eduardo Flores", "c": "+54 9 387 017-0119", "ig": "Iglesia Emanuel", "ed": 30, "pg": "Parcial", "ab": 12000, "to": 20000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 18, "n": "Daniela Herrera", "c": "+54 9 387 018-0126", "ig": "Comunidad Fe", "ed": 24, "pg": "Sin pagar", "ab": 0, "to": 20000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 19, "n": "Andrés Morales", "c": "+54 9 387 019-0133", "ig": "Iglesia Gracia", "ed": 28, "pg": "Pagado", "ab": 20000, "to": 20000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 20, "n": "Claudia Jiménez", "c": "+54 9 387 020-0140", "ig": "Iglesia Vida Nueva", "ed": 26, "pg": "Pagado", "ab": 20000, "to": 20000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 21, "n": "Ramón Torres", "c": "+54 9 387 021-0147", "ig": "Iglesia Emanuel", "ed": 34, "pg": "Pagado", "ab": 20000, "to": 20000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 22, "n": "Beatriz Núñez", "c": "+54 9 387 022-0154", "ig": "Comunidad Fe", "ed": 29, "pg": "Parcial", "ab": 12000, "to": 20000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 23, "n": "Hugo Silva", "c": "+54 9 387 023-0161", "ig": "Iglesia Gracia", "ed": 32, "pg": "Pagado", "ab": 20000, "to": 20000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 24, "n": "Carmen Gómez", "c": "+54 9 387 024-0168", "ig": "Iglesia Vida Nueva", "ed": 23, "pg": "Pagado", "ab": 20000, "to": 20000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 25, "n": "Ignacio Romero", "c": "+54 9 387 025-0175", "ig": "Iglesia Emanuel", "ed": 27, "pg": "Sin pagar", "ab": 0, "to": 20000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 26, "n": "Mariana Díaz", "c": "+54 9 387 026-0182", "ig": "Comunidad Fe", "ed": 21, "pg": "Pagado", "ab": 20000, "to": 20000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 27, "n": "Tomás Ortiz", "c": "+54 9 387 027-0189", "ig": "Iglesia Gracia", "ed": 25, "pg": "Pagado", "ab": 20000, "to": 20000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 28, "n": "Lucía Vargas", "c": "+54 9 387 028-0196", "ig": "Iglesia Vida Nueva", "ed": 22, "pg": "Parcial", "ab": 12000, "to": 20000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}]}, {"nombre": "Retiro Matrimonios 2025", "fechas": "7–9 Nov 2025", "lugar": "Centro Emaús · Cafayate", "costo": 25000, "cupo": 20, "versiculo": "Efesios 5:25", "tema": "Fortaleciendo el pacto matrimonial", "estado": "Planificando", "icono": "💍", "cs": {"main": "7C3200", "med": "B84D00", "accent": "E07030", "light": "FDDDC0", "xlight": "FEF0E0", "bg": "FFF8F2", "htxt": "FFFFFF", "ctxt": "4A1E00"}, "id": "R2", "participantes": [{"id": 29, "n": "Carlos y Ana Pérez", "c": "+54 9 387 100-0001", "ig": "Iglesia Vida Nueva", "ed": 38, "pg": "Pagado", "ab": 25000, "to": 25000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 30, "n": "Juan y María López", "c": "+54 9 387 100-0002", "ig": "Iglesia Emanuel", "ed": 42, "pg": "Parcial", "ab": 15000, "to": 25000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 31, "n": "Roberto y Claudia Silva", "c": "+54 9 387 100-0003", "ig": "Comunidad Fe", "ed": 35, "pg": "Sin pagar", "ab": 0, "to": 25000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 32, "n": "Diego y Laura Fernández", "c": "+54 9 387 100-0004", "ig": "Iglesia Gracia", "ed": 40, "pg": "Pagado", "ab": 25000, "to": 25000, "al": "Duerme", "me": "Metformina 500mg desayuno", "di": "Diabético", "ko": "Diabetes tipo 2", "no": ""}, {"id": 33, "n": "Marcos y Sofía Torres", "c": "+54 9 387 100-0005", "ig": "Iglesia Vida Nueva", "ed": 33, "pg": "Pagado", "ab": 25000, "to": 25000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 34, "n": "Pablo y Valentina Ruiz", "c": "+54 9 387 100-0006", "ig": "Iglesia Emanuel", "ed": 37, "pg": "Parcial", "ab": 12000, "to": 25000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 35, "n": "Hernán y Patricia Gómez", "c": "+54 9 387 100-0007", "ig": "Comunidad Fe", "ed": 45, "pg": "Pagado", "ab": 25000, "to": 25000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 36, "n": "Facundo y Natalia Castro", "c": "+54 9 387 100-0008", "ig": "Iglesia Gracia", "ed": 31, "pg": "Sin pagar", "ab": 0, "to": 25000, "al": "Duerme", "me": "", "di": "Sin gluten", "ko": "Celiaquía", "no": ""}, {"id": 37, "n": "Gustavo y Elena Morales", "c": "+54 9 387 100-0009", "ig": "Iglesia Vida Nueva", "ed": 44, "pg": "Pagado", "ab": 25000, "to": 25000, "al": "Duerme", "me": "Enalapril 10mg — noche", "di": "Hiposódico", "ko": "Hipertensión", "no": ""}, {"id": 38, "n": "Sebastián y Carmen Díaz", "c": "+54 9 387 100-0010", "ig": "Iglesia Emanuel", "ed": 36, "pg": "Pagado", "ab": 25000, "to": 25000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 39, "n": "Lucas y Beatriz Vargas", "c": "+54 9 387 100-0011", "ig": "Comunidad Fe", "ed": 39, "pg": "Parcial", "ab": 10000, "to": 25000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 40, "n": "Ignacio y Mariana Herrera", "c": "+54 9 387 100-0012", "ig": "Iglesia Gracia", "ed": 41, "pg": "Pagado", "ab": 25000, "to": 25000, "al": "Duerme", "me": "", "di": "Vegetariano", "ko": "", "no": ""}]}, {"nombre": "Retiro Líderes 2024", "fechas": "3–5 Ago 2024", "lugar": "Casa de Retiros La Paz · Salta", "costo": 18000, "cupo": 25, "versiculo": "Josué 1:9", "tema": "Equipando a los siervos de la iglesia", "estado": "Finalizado", "icono": "👑", "cs": {"main": "3B1060", "med": "5E2A8C", "accent": "8A52BE", "light": "DDD0F0", "xlight": "EEE6F8", "bg": "F7F2FC", "htxt": "FFFFFF", "ctxt": "2A0A48"}, "id": "R3", "participantes": [{"id": 41, "n": "Pastor Juan Díaz", "c": "+54 9 387 200-0001", "ig": "Iglesia Vida Nueva", "ed": 48, "pg": "Pagado", "ab": 18000, "to": 18000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 42, "n": "Diac. María Castro", "c": "+54 9 387 200-0002", "ig": "Iglesia Emanuel", "ed": 45, "pg": "Pagado", "ab": 18000, "to": 18000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 43, "n": "Hno. Luis Vera", "c": "+54 9 387 200-0003", "ig": "Comunidad Fe", "ed": 38, "pg": "Pagado", "ab": 18000, "to": 18000, "al": "Duerme", "me": "Tiroxina 50mcg — ayunas", "di": "", "ko": "Hipotiroidismo", "no": ""}, {"id": 44, "n": "Lic. Sandra Méndez", "c": "+54 9 387 200-0004", "ig": "Iglesia Gracia", "ed": 42, "pg": "Pagado", "ab": 18000, "to": 18000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 45, "n": "Pbro. Carlos Romero", "c": "+54 9 387 200-0005", "ig": "Iglesia Vida Nueva", "ed": 55, "pg": "Pagado", "ab": 18000, "to": 18000, "al": "Duerme", "me": "Enalapril 5mg — noche", "di": "Hiposódico", "ko": "Hipertensión", "no": ""}, {"id": 46, "n": "Lic. Patricia Lagos", "c": "+54 9 387 200-0006", "ig": "Iglesia Emanuel", "ed": 39, "pg": "Pagado", "ab": 18000, "to": 18000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 47, "n": "Sr. Diego Antúnez", "c": "+54 9 387 200-0007", "ig": "Comunidad Fe", "ed": 35, "pg": "Pagado", "ab": 18000, "to": 18000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 48, "n": "Sra. Elena Ramos", "c": "+54 9 387 200-0008", "ig": "Iglesia Gracia", "ed": 43, "pg": "Pagado", "ab": 18000, "to": 18000, "al": "Duerme", "me": "", "di": "Sin lactosa", "ko": "Intolerancia lactosa", "no": ""}, {"id": 49, "n": "Hno. Tomás Gutiérrez", "c": "+54 9 387 200-0009", "ig": "Iglesia Vida Nueva", "ed": 36, "pg": "Pagado", "ab": 18000, "to": 18000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 50, "n": "Lic. Natalia Ortega", "c": "+54 9 387 200-0010", "ig": "Iglesia Emanuel", "ed": 40, "pg": "Pagado", "ab": 18000, "to": 18000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 51, "n": "Dr. Roberto Salinas", "c": "+54 9 387 200-0011", "ig": "Comunidad Fe", "ed": 52, "pg": "Pagado", "ab": 18000, "to": 18000, "al": "Duerme", "me": "Aspirina 100mg — noche. Omeprazol 20mg — mañana", "di": "", "ko": "Gastritis, HTA", "no": ""}, {"id": 52, "n": "Lic. Carmen Fuentes", "c": "+54 9 387 200-0012", "ig": "Iglesia Gracia", "ed": 37, "pg": "Pagado", "ab": 18000, "to": 18000, "al": "Duerme", "me": "", "di": "Vegetariano", "ko": "", "no": ""}, {"id": 53, "n": "Pbro. Marcos Ibáñez", "c": "+54 9 387 200-0013", "ig": "Iglesia Vida Nueva", "ed": 50, "pg": "Pagado", "ab": 18000, "to": 18000, "al": "Solo día", "me": "", "di": "", "ko": "", "no": "Regresa el mismo día"}, {"id": 54, "n": "Hna. Sofía Peralta", "c": "+54 9 387 200-0014", "ig": "Iglesia Emanuel", "ed": 33, "pg": "Pagado", "ab": 18000, "to": 18000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 55, "n": "Sr. Andrés Villalba", "c": "+54 9 387 200-0015", "ig": "Comunidad Fe", "ed": 41, "pg": "Pagado", "ab": 18000, "to": 18000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 56, "n": "Sra. Laura Mendoza", "c": "+54 9 387 200-0016", "ig": "Iglesia Gracia", "ed": 38, "pg": "Pagado", "ab": 18000, "to": 18000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 57, "n": "Lic. Ignacio Serrano", "c": "+54 9 387 200-0017", "ig": "Iglesia Vida Nueva", "ed": 44, "pg": "Pagado", "ab": 18000, "to": 18000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 58, "n": "Sra. Beatriz Cáceres", "c": "+54 9 387 200-0018", "ig": "Iglesia Emanuel", "ed": 46, "pg": "Pagado", "ab": 18000, "to": 18000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}]}, {"nombre": "Retiro de Varones 2025", "fechas": "17–19 Oct 2025", "lugar": "Hacienda El Algarrobo · Cerrillos", "costo": 22000, "cupo": 30, "versiculo": "1 Corintios 16:13", "tema": "Sed firmes, estad en la fe", "estado": "Planificando", "icono": "⚔️", "cs": {"main": "1A1A2E", "med": "3D3D5C", "accent": "6B6B8A", "light": "D8D8E4", "xlight": "EBEBF2", "bg": "F5F5F8", "htxt": "FFFFFF", "ctxt": "1A1A2E"}, "id": "R4", "participantes": [{"id": 59, "n": "Juan Pérez", "c": "+54 9 387 400-0001", "ig": "Iglesia Vida Nueva", "ed": 32, "pg": "Pagado", "ab": 22000, "to": 22000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 60, "n": "Carlos García", "c": "+54 9 387 400-0002", "ig": "Iglesia Emanuel", "ed": 28, "pg": "Pagado", "ab": 22000, "to": 22000, "al": "Duerme", "me": "Enalapril 10mg — noche", "di": "Hiposódico", "ko": "Hipertensión", "no": ""}, {"id": 61, "n": "Roberto Silva", "c": "+54 9 387 400-0003", "ig": "Comunidad Fe", "ed": 45, "pg": "Parcial", "ab": 11000, "to": 22000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 62, "n": "Diego Fernández", "c": "+54 9 387 400-0004", "ig": "Iglesia Gracia", "ed": 38, "pg": "Pagado", "ab": 22000, "to": 22000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 63, "n": "Marcos Torres", "c": "+54 9 387 400-0005", "ig": "Iglesia Vida Nueva", "ed": 29, "pg": "Sin pagar", "ab": 0, "to": 22000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 64, "n": "Pablo Ruiz", "c": "+54 9 387 400-0006", "ig": "Iglesia Emanuel", "ed": 35, "pg": "Pagado", "ab": 22000, "to": 22000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 65, "n": "Hernán Gómez", "c": "+54 9 387 400-0007", "ig": "Comunidad Fe", "ed": 42, "pg": "Pagado", "ab": 22000, "to": 22000, "al": "Duerme", "me": "Omeprazol 20mg — mañana", "di": "", "ko": "Gastritis", "no": ""}, {"id": 66, "n": "Facundo Castro", "c": "+54 9 387 400-0008", "ig": "Iglesia Gracia", "ed": 26, "pg": "Parcial", "ab": 10000, "to": 22000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 67, "n": "Gustavo Morales", "c": "+54 9 387 400-0009", "ig": "Iglesia Vida Nueva", "ed": 50, "pg": "Pagado", "ab": 22000, "to": 22000, "al": "Duerme", "me": "Aspirina 100mg — noche", "di": "", "ko": "HTA leve", "no": ""}, {"id": 68, "n": "Sebastián Díaz", "c": "+54 9 387 400-0010", "ig": "Iglesia Emanuel", "ed": 33, "pg": "Sin pagar", "ab": 0, "to": 22000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 69, "n": "Lucas Vargas", "c": "+54 9 387 400-0011", "ig": "Comunidad Fe", "ed": 31, "pg": "Pagado", "ab": 22000, "to": 22000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 70, "n": "Ignacio Herrera", "c": "+54 9 387 400-0012", "ig": "Iglesia Gracia", "ed": 40, "pg": "Pagado", "ab": 22000, "to": 22000, "al": "Duerme", "me": "Tiroxina 50mcg — ayunas", "di": "", "ko": "Hipotiroidismo", "no": ""}, {"id": 71, "n": "Andrés López", "c": "+54 9 387 400-0013", "ig": "Iglesia Vida Nueva", "ed": 27, "pg": "Pagado", "ab": 22000, "to": 22000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 72, "n": "Fernando Medina", "c": "+54 9 387 400-0014", "ig": "Iglesia Emanuel", "ed": 36, "pg": "Parcial", "ab": 15000, "to": 22000, "al": "Duerme", "me": "", "di": "Sin lactosa", "ko": "Intolerancia lactosa", "no": ""}, {"id": 73, "n": "Tomás Ibáñez", "c": "+54 9 387 400-0015", "ig": "Comunidad Fe", "ed": 44, "pg": "Sin pagar", "ab": 0, "to": 22000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 74, "n": "Ramón Quiroga", "c": "+54 9 387 400-0016", "ig": "Iglesia Gracia", "ed": 39, "pg": "Pagado", "ab": 22000, "to": 22000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 75, "n": "Nicolás Salinas", "c": "+54 9 387 400-0017", "ig": "Iglesia Vida Nueva", "ed": 25, "pg": "Pagado", "ab": 22000, "to": 22000, "al": "Solo día", "me": "", "di": "", "ko": "", "no": "Regresa el mismo día"}, {"id": 76, "n": "Eduardo Villalba", "c": "+54 9 387 400-0018", "ig": "Iglesia Emanuel", "ed": 48, "pg": "Pagado", "ab": 22000, "to": 22000, "al": "Duerme", "me": "Metformina 500mg — desayuno y cena", "di": "Diabético", "ko": "Diabetes tipo 2", "no": ""}, {"id": 77, "n": "Hugo Serrano", "c": "+54 9 387 400-0019", "ig": "Comunidad Fe", "ed": 37, "pg": "Parcial", "ab": 8000, "to": 22000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 78, "n": "Martín Cáceres", "c": "+54 9 387 400-0020", "ig": "Iglesia Gracia", "ed": 43, "pg": "Pagado", "ab": 22000, "to": 22000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}]}, {"nombre": "Retiro de Mujeres 2025", "fechas": "14–16 Nov 2025", "lugar": "Casa de Retiros La Paz · Salta", "costo": 22000, "cupo": 30, "versiculo": "Proverbios 31:25", "tema": "Fuerza y honor son su vestidura", "estado": "Planificando", "icono": "🌸", "cs": {"main": "7B1A45", "med": "B03070", "accent": "D4709A", "light": "F5C0D8", "xlight": "FAE0EC", "bg": "FDF4F8", "htxt": "FFFFFF", "ctxt": "4A0E28"}, "id": "R5", "participantes": [{"id": 79, "n": "María González", "c": "+54 9 387 500-0001", "ig": "Iglesia Vida Nueva", "ed": 34, "pg": "Pagado", "ab": 22000, "to": 22000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 80, "n": "Ana Pérez", "c": "+54 9 387 500-0002", "ig": "Iglesia Emanuel", "ed": 29, "pg": "Pagado", "ab": 22000, "to": 22000, "al": "Duerme", "me": "Tiroxina 75mcg — ayunas", "di": "", "ko": "Hipotiroidismo", "no": ""}, {"id": 81, "n": "Claudia Silva", "c": "+54 9 387 500-0003", "ig": "Comunidad Fe", "ed": 41, "pg": "Parcial", "ab": 12000, "to": 22000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 82, "n": "Laura Fernández", "c": "+54 9 387 500-0004", "ig": "Iglesia Gracia", "ed": 37, "pg": "Pagado", "ab": 22000, "to": 22000, "al": "Duerme", "me": "Insulina 8U — desayuno y cena", "di": "Diabético", "ko": "Diabetes tipo 1", "no": "Requiere refrigerador"}, {"id": 83, "n": "Sofía Torres", "c": "+54 9 387 500-0005", "ig": "Iglesia Vida Nueva", "ed": 26, "pg": "Sin pagar", "ab": 0, "to": 22000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 84, "n": "Valentina Ruiz", "c": "+54 9 387 500-0006", "ig": "Iglesia Emanuel", "ed": 32, "pg": "Pagado", "ab": 22000, "to": 22000, "al": "Duerme", "me": "", "di": "Sin gluten", "ko": "Celiaquía", "no": ""}, {"id": 85, "n": "Patricia Gómez", "c": "+54 9 387 500-0007", "ig": "Comunidad Fe", "ed": 46, "pg": "Pagado", "ab": 22000, "to": 22000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 86, "n": "Natalia Castro", "c": "+54 9 387 500-0008", "ig": "Iglesia Gracia", "ed": 30, "pg": "Pagado", "ab": 22000, "to": 22000, "al": "Duerme", "me": "", "di": "Vegetariano", "ko": "", "no": ""}, {"id": 87, "n": "Elena Morales", "c": "+54 9 387 500-0009", "ig": "Iglesia Vida Nueva", "ed": 38, "pg": "Parcial", "ab": 10000, "to": 22000, "al": "Duerme", "me": "Sertralina 50mg — mañana", "di": "", "ko": "Ansiedad", "no": "Confidencial"}, {"id": 88, "n": "Carmen Díaz", "c": "+54 9 387 500-0010", "ig": "Iglesia Emanuel", "ed": 44, "pg": "Sin pagar", "ab": 0, "to": 22000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 89, "n": "Beatriz Vargas", "c": "+54 9 387 500-0011", "ig": "Comunidad Fe", "ed": 35, "pg": "Pagado", "ab": 22000, "to": 22000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 90, "n": "Mariana Herrera", "c": "+54 9 387 500-0012", "ig": "Iglesia Gracia", "ed": 28, "pg": "Pagado", "ab": 22000, "to": 22000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 91, "n": "Lucía López", "c": "+54 9 387 500-0013", "ig": "Iglesia Vida Nueva", "ed": 23, "pg": "Parcial", "ab": 8000, "to": 22000, "al": "Duerme", "me": "", "di": "Sin lactosa", "ko": "Intolerancia lactosa", "no": ""}, {"id": 92, "n": "Sandra Medina", "c": "+54 9 387 500-0014", "ig": "Iglesia Emanuel", "ed": 40, "pg": "Pagado", "ab": 22000, "to": 22000, "al": "Duerme", "me": "Enalapril 5mg — noche", "di": "Hiposódico", "ko": "Hipertensión", "no": ""}, {"id": 93, "n": "Gabriela Ibáñez", "c": "+54 9 387 500-0015", "ig": "Comunidad Fe", "ed": 33, "pg": "Sin pagar", "ab": 0, "to": 22000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 94, "n": "Patricia Quiroga", "c": "+54 9 387 500-0016", "ig": "Iglesia Gracia", "ed": 51, "pg": "Pagado", "ab": 22000, "to": 22000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 95, "n": "Roxana Salinas", "c": "+54 9 387 500-0017", "ig": "Iglesia Vida Nueva", "ed": 27, "pg": "Pagado", "ab": 22000, "to": 22000, "al": "Solo día", "me": "", "di": "", "ko": "", "no": "Regresa el mismo día"}, {"id": 96, "n": "Daniela Villalba", "c": "+54 9 387 500-0018", "ig": "Iglesia Emanuel", "ed": 36, "pg": "Pagado", "ab": 22000, "to": 22000, "al": "Duerme", "me": "", "di": "Vegano", "ko": "", "no": ""}, {"id": 97, "n": "Fernanda Serrano", "c": "+54 9 387 500-0019", "ig": "Comunidad Fe", "ed": 43, "pg": "Parcial", "ab": 15000, "to": 22000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 98, "n": "Victoria Cáceres", "c": "+54 9 387 500-0020", "ig": "Iglesia Gracia", "ed": 31, "pg": "Pagado", "ab": 22000, "to": 22000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 99, "n": "Romina Ortega", "c": "+54 9 387 500-0021", "ig": "Iglesia Vida Nueva", "ed": 24, "pg": "Sin pagar", "ab": 0, "to": 22000, "al": "Duerme", "me": "", "di": "", "ko": "", "no": ""}, {"id": 100, "n": "Natalia Fuentes", "c": "+54 9 387 500-0022", "ig": "Iglesia Emanuel", "ed": 39, "pg": "Pagado", "ab": 22000, "to": 22000, "al": "Duerme", "me": "Omeprazol 20mg — mañana", "di": "", "ko": "Gastritis", "no": ""}]}]
 
-// Getter: participantes del retiro activo
-const PD=()=>activoIdx>=0?(RETIROS[activoIdx].participantes||[]):[]
+let ACTIVO_ID = 'R1'
+let partFilter = ''
+let saludFilter = ''
+let orgAssign = {}
+let nextId = 10000
 
-const COLS=['#B8972A','#5C4A2A','#2D7A4F','#1E5C8B','#9B2335','#7C5A2A','#3D6B8A','#6B4226','#2A6B4F','#8B5E2A','#1A5C3A','#5C2A6B']
-const ini=n=>n.split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase()
-const col=n=>{let h=0;for(const c of n)h=(h*31+c.charCodeAt(0))&0xffff;return COLS[h%COLS.length]}
-const $=id=>document.getElementById(id)
+const $ = id => document.getElementById(id)
+const ini = n => n.split(' ').slice(0,2).map(x=>x[0]||'').join('').toUpperCase()
+const COLS = ['#C49A2A','#1A6B4A','#1B3F6E','#7A1A2E','#6D28D9','#8B5800','#047857','#B03070']
+const colFor = n => { let h=0; for(const c of n) h=(h*31+c.charCodeAt(0))&0xffff; return COLS[h%COLS.length] }
+const fmt$ = v => '$'+Number(v||0).toLocaleString('es-AR')
+const pct = (a,b) => b>0?Math.round(a/b*100):0
 
-// ═══ NAVIGATION ══════════════════════════════════════════════════
-const TITLES={dashboard:'Dashboard',part:'Participantes',pagos:'Pagos & Cuotas',salud:'Salud & Dietas',aloj:'Alojamiento',org:'Organigrama de Servicio',comidas:'Comidas',programa:'Programa',alertas:'Alertas',retiros:'Mis Retiros'}
-function nav(p){
-  document.querySelectorAll('.pag').forEach(x=>x.classList.remove('on'))
-  document.querySelectorAll('.ni').forEach(x=>x.classList.remove('on'))
-  const pg=$('p-'+p); if(pg)pg.classList.add('on')
-  document.querySelectorAll(`.ni[data-p="${p}"]`).forEach(x=>x.classList.add('on'))
-  $('tbt').textContent=TITLES[p]||p
-  $('sb').classList.remove('on');$('sb-ov').style.display='none'
+function ret() { return RETIROS.find(r=>r.id===ACTIVO_ID) }
+function parts() { return (ret()||{participantes:[]}).participantes }
+function cs() { return (ret()||{cs:{main:'2E1F0C',med:'3A2E22',accent:'C49A2A',light:'F0E8D8',xlight:'F8F4EE',bg:'FFFFFF',htxt:'FFFFFF',ctxt:'1E1408'}}).cs }
+
+// ════════════════════════════════════════════════════════════════
+// THEME APPLICATION
+// ════════════════════════════════════════════════════════════════
+function applyTheme(c) {
+  const root = document.documentElement.style
+  root.setProperty('--rm',   '#'+c.main)
+  root.setProperty('--rmed', '#'+c.med)
+  root.setProperty('--rac',  '#'+c.accent)
+  root.setProperty('--rli',  '#'+c.light)
+  root.setProperty('--rxl',  '#'+c.xlight)
+  root.setProperty('--rbg',  '#'+c.bg)
+  root.setProperty('--rht',  '#'+c.htxt)
+  root.setProperty('--rct',  '#'+c.ctxt)
+}
+
+// ════════════════════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════════════════════
+const TITLES = {dashboard:'Dashboard',datos:'Participantes',pagos:'Pagos & Cuotas',salud:'Salud & Dietas',aloj:'Alojamiento',org:'Organigrama',prog:'Programa',index:'Índice General',comp:'Comparativo Global'}
+
+function nav(v) {
+  document.querySelectorAll('.pag').forEach(p=>p.classList.remove('on'))
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'))
+  $('p-'+v).classList.add('on')
+  document.querySelectorAll(`.ni[data-v="${v}"]`).forEach(n=>n.classList.add('on'))
+  $('tb-tit').textContent = TITLES[v]||v
+  document.getElementById('sb').classList.remove('on')
+  $('sb-ov').style.display='none'
   window.scrollTo(0,0)
-  if(p==='part')rPart()
-  if(p==='pagos')rPagos()
-  if(p==='salud')rSalud()
-  if(p==='aloj')rAloj()
-  if(p==='org')rOrg()
-  if(p==='comidas')rComidas()
-  if(p==='programa')showProg('vie',$('pt-v'))
-  if(p==='alertas')rAlertas()
-  if(p==='retiros')rRetiros()
-}
-function tglSb(){const s=$('sb'),o=$('sb-ov');const op=s.classList.toggle('on');o.style.display=op?'block':'none'}
-
-// ═══ MODALS ═══════════════════════════════════════════════════════
-const openM=id=>{$(id).classList.add('on')}
-const closeM=id=>{$(id).classList.remove('on')}
-const ovC=(e,id)=>{if(e.target.id===id)closeM(id)}
-
-// ═══ TOAST ════════════════════════════════════════════════════════
-function toast(msg,type=''){
-  const t=document.createElement('div');t.className='tk'+(type?' '+type:'');t.textContent=msg;$('ta').appendChild(t)
-  setTimeout(()=>{t.style.transition='all .2s';t.style.opacity='0';t.style.transform='translateX(14px)';setTimeout(()=>t.remove(),220)},2800)
+  renderView(v)
 }
 
-// ═══ TABS ══════════════════════════════════════════════════════════
-function fTab(btn){btn.closest('.ft').querySelectorAll('.ftb').forEach(t=>t.classList.remove('on'));btn.classList.add('on')}
-
-// ═══ PARTICIPANTES ════════════════════════════════════════════════
-const pagoTag=p=>p.pago==='paid'?'<span class="tag t-pag">Pagado</span>':p.pago==='partial'?`<span class="tag t-par">Parcial ·$${(p.total-p.abonado).toLocaleString()}</span>`:'<span class="tag t-nop">Sin abonar</span>'
-const alojBadge=p=>p.aloj==='duerme'?'<span class="badge b-ok">Duerme</span>':p.aloj==='antes'?'<span class="badge b-er">Se va antes</span>':'<span class="badge b-wn">Solo día</span>'
-function rPart(){
-  const lista=PD()
-  const sub=$('part-sub')
-  if(sub)sub.textContent=lista.length?`${lista.length} inscriptos · ${activoIdx>=0?RETIROS[activoIdx].n:''}`:''
-  if(!lista.length){
-    $('ptb').innerHTML=`<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--t3);font-size:13px">
-      ${activoIdx<0?'Sin retiro activo — activá o creá uno desde "Mis Retiros"':'Sin participantes registrados aún — agregá el primero con el botón + Participante'}
-    </td></tr>`
-    return
-  }
-  $('ptb').innerHTML=lista.map(p=>{
-    const st=[p.meds?'<span class="tag t-med">💊 Med.</span>':'',p.dieta?'<span class="tag t-die">🥗 Dieta</span>':'',p.alergias?'<span class="tag t-aly">⚠️ Alergia</span>':''].filter(Boolean).join('')
-    return`<tr>
-      <td><div class="pn"><div class="av" style="background:${col(p.nombre)};width:30px;height:30px;font-size:10px">${ini(p.nombre)}</div><div><div class="pnf">${p.nombre}</div><div class="pns">${p.iglesia} · ${p.edad} años</div></div></div></td>
-      <td style="font-size:11px;color:var(--t3)">${p.cel}</td>
-      <td>${pagoTag(p)}</td><td>${alojBadge(p)}</td>
-      <td>${st||'<span style="font-size:10px;color:var(--t3)">—</span>'}</td>
-      <td><button class="btn bs bsm" onclick="verP('${p.nombre.replace(/'/g,"\\'")}')">Ver</button></td>
-    </tr>`}).join('')
-}
-function verP(nombre){
-  const p=PD().find(x=>x.nombre===nombre);if(!p)return
-  $('vp-t').textContent='✞ '+p.nombre
-  const pb=p.pago==='paid'?'<span class="tag t-pag">Pagado completo</span>':p.pago==='partial'?`<span class="tag t-par">Parcial · $${p.abonado.toLocaleString()} de $${p.total.toLocaleString()}</span>`:'<span class="tag t-nop">Sin abonar</span>'
-  $('vp-c').innerHTML=`
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-      <div class="av" style="background:${col(p.nombre)};width:48px;height:48px;font-size:16px">${ini(p.nombre)}</div>
-      <div><div style="font-family:var(--f);font-size:17px;font-weight:600">${p.nombre}</div>
-      <div style="font-size:11px;color:var(--t3);margin-top:2px">${p.iglesia} · ${p.edad} años · ${p.cel}</div>
-      <div style="margin-top:5px">${pb}</div></div>
-    </div>
-    ${p.meds?`<div class="al aw"><span class="al-i">💊</span><div><strong>Medicación:</strong> ${p.meds}</div></div>`:''}
-    ${p.dieta?`<div class="al ai"><span class="al-i">🥗</span><div><strong>Dieta:</strong> ${p.dieta}</div></div>`:''}
-    ${p.alergias?`<div class="al aw"><span class="al-i">⚠️</span><div><strong>Alergias:</strong> ${p.alergias}</div></div>`:''}
-    ${p.cond?`<div class="al aw"><span class="al-i">⚕️</span><div><strong>Condición:</strong> ${p.cond}</div></div>`:''}
-    ${p.notas?`<div class="al ag"><span class="al-i">📝</span><div><strong>Notas:</strong> ${p.notas}</div></div>`:''}
-    <div style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap">
-      ${p.aloj==='duerme'?'<span class="badge b-ok">🛏 Se queda a dormir</span>':p.aloj==='antes'?'<span class="badge b-er">🚪 Se va antes</span>':'<span class="badge b-wn">☀️ Solo de día</span>'}
-    </div>`
-  openM('m-vp')
+function renderView(v) {
+  if(v==='dashboard') rDash()
+  else if(v==='datos')   rDatos()
+  else if(v==='pagos')   rPagos()
+  else if(v==='salud')   rSalud()
+  else if(v==='aloj')    rAloj()
+  else if(v==='org')     rOrg()
+  else if(v==='prog')    showProg(progDia, $(progDia==='vie'?'pt-v':progDia==='sab'?'pt-s':'pt-d'))
+  else if(v==='index')   rIndex()
+  else if(v==='comp')    rComp()
 }
 
-// ═══ PAGOS ════════════════════════════════════════════════════════
-const FEC=['25/ago','26/ago','27/ago','28/ago','30/ago','1/sep','2/sep','3/sep']
-function rPagos(){
-  const lista=PD()
-  const ret=activoIdx>=0?RETIROS[activoIdx]:null
-  // Actualizar resumen financiero
-  const costoP=ret?ret.costo:0
-  const totalEsp=costoP*lista.length
-  const cobrado=lista.reduce((s,x)=>s+x.abonado,0)
-  const pendiente=totalEsp-cobrado
-  const pct=totalEsp>0?Math.round(cobrado/totalEsp*100):0
-  const eSub=$('pag-sub');if(eSub)eSub.textContent=ret?`Costo: $${costoP.toLocaleString()} por persona`:'Sin retiro activo'
-  const eTE=$('pag-total-esp');if(eTE)eTE.textContent=`$${totalEsp.toLocaleString()}`
-  const eCob=$('pag-cobrado');if(eCob)eCob.textContent=`$${cobrado.toLocaleString()}`
-  const ePen=$('pag-pendiente');if(ePen)ePen.textContent=`$${pendiente.toLocaleString()}`
-  const ePct=$('pag-pct-label');if(ePct)ePct.textContent=`${pct}%`
-  const ePf=$('pag-pf');if(ePf)ePf.style.width=pct+'%'
-  if(!lista.length){
-    $('pagtb').innerHTML=`<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--t3);font-size:13px">${activoIdx<0?'Sin retiro activo':'Sin participantes aún'}</td></tr>`
-    return
-  }
-  $('pagtb').innerHTML=lista.map((p,i)=>{
-    const r=p.total-p.abonado
-    const b=p.pago==='paid'?'<span class="badge b-ok">✓ Completo</span>':p.pago==='partial'?'<span class="badge b-wn">Parcial</span>':'<span class="badge b-er">Pendiente</span>'
-    return`<tr>
-      <td><div class="pn"><div class="av" style="background:${col(p.nombre)};width:26px;height:26px;font-size:9px">${ini(p.nombre)}</div><span style="font-size:12.5px;font-weight:500">${p.nombre}</span></div></td>
-      <td style="font-family:var(--f);font-weight:600">$${p.total.toLocaleString()}</td>
-      <td style="font-family:var(--f);color:var(--ok);font-weight:600">$${p.abonado.toLocaleString()}</td>
-      <td style="font-family:var(--f);color:${r>0?'var(--er)':'var(--ok)'};font-weight:600">$${r.toLocaleString()}</td>
-      <td>${b}</td>
-      <td style="font-size:11px;color:var(--t3)">${p.abonado>0?FEC[i%FEC.length]:'—'}</td>
-      <td><button class="btn bs bsm" onclick="openM('m-pago')">+ Pago</button></td>
-    </tr>`}).join('')
+function setRetiro(id) {
+  ACTIVO_ID = id
+  applyTheme(cs())
+  buildSidebar()
+  refreshAll()
+  save()
 }
 
-// ═══ SALUD ════════════════════════════════════════════════════════
-function rSalud(){
-  const lista=PD()
-  const empty=activoIdx<0?'Sin retiro activo':'Sin participantes registrados aún'
-  const wm=lista.filter(p=>p.meds)
-  const eMedCs=$('salud-med-cs');if(eMedCs)eMedCs.textContent=wm.length?`${wm.length} participante${wm.length>1?'s':''} con medicación`:'Sin medicación registrada'
-  const wd2=lista.filter(p=>p.dieta)
-  const eDietCs=$('salud-diet-cs');if(eDietCs)eDietCs.textContent=wd2.length?`${wd2.length} participante${wd2.length>1?'s':''} con restricciones`:'Sin restricciones registradas'
-  $('meds-lst').innerHTML=wm.length?wm.map(p=>`<div class="om"><div class="av" style="background:${col(p.nombre)};width:26px;height:26px;font-size:9px">${ini(p.nombre)}</div><div style="flex:1"><div style="font-size:12.5px;font-weight:500">${p.nombre}</div><div style="font-size:11px;color:var(--t3);margin-top:1px">${p.meds}</div></div></div>`).join(''):`<div style="color:var(--t3);font-size:12px;padding:8px 0">${lista.length?'Ningún participante con medicación registrada.':empty}</div>`
-  const wd=lista.filter(p=>p.dieta)
-  $('diet-lst').innerHTML=wd.length?wd.map(p=>`<div class="om"><div class="av" style="background:${col(p.nombre)};width:26px;height:26px;font-size:9px">${ini(p.nombre)}</div><div style="flex:1"><div style="font-size:12.5px;font-weight:500">${p.nombre}</div><div style="font-size:11px;color:var(--t3);margin-top:1px">${p.dieta}</div></div></div>`).join(''):`<div style="color:var(--t3);font-size:12px;padding:8px 0">${lista.length?'Sin dietas especiales.':empty}</div>`
-  const wa=lista.filter(p=>p.alergias||p.cond)
-  $('aler-lst').innerHTML=wa.length?wa.map(p=>`<div class="om"><div class="av" style="background:${col(p.nombre)};width:26px;height:26px;font-size:9px">${ini(p.nombre)}</div><div style="flex:1"><div style="font-size:12.5px;font-weight:500">${p.nombre}</div><div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:3px">${p.alergias?`<span class="tag t-aly">⚠️ ${p.alergias}</span>`:''}${p.cond?`<span class="tag t-med">⚕️ ${p.cond}</span>`:''}</div></div></div>`).join(''):`<div style="color:var(--t3);font-size:12px;padding:8px 0">${lista.length?'Sin alergias ni condiciones registradas.':empty}</div>`
+function refreshAll() {
+  applyTheme(cs())
+  const active = document.querySelector('.pag.on')
+  if(active) renderView(active.id.replace('p-',''))
+  rIndex(); rComp()
+  updateAlertBadge()
 }
 
-// ═══ ALOJAMIENTO ══════════════════════════════════════════════════
-function rAloj(){
-  const lista=PD()
-  const empty=activoIdx<0?'Sin retiro activo':'Sin participantes registrados — el alojamiento se configurará a medida que los cargues'
-
-  // Secciones estáticas inferiores (se van antes / solo día) — limpiar si no hay datos
-  const antesDiv=document.querySelector('#p-aloj .card:nth-child(1)')
-  const diaDiv=document.querySelector('#p-aloj .card:nth-child(2)')
-
-  if(!lista.length){
-    $('hab-lst').innerHTML=`<div style="color:var(--t3);font-size:12px;padding:16px 0;text-align:center">${empty}</div>`
-    return
-  }
-
-  const duermen=lista.filter(x=>x.aloj==='duerme')
-  const soloDia=lista.filter(x=>x.aloj==='dia')
-  const seVan=lista.filter(x=>x.aloj==='antes')
-  const CAP=6
-  const ROOMS=[]
-  for(let i=0;i<duermen.length;i+=CAP){
-    const grupo=duermen.slice(i,i+CAP)
-    const num=ROOMS.length+1
-    ROOMS.push({n:`Habitación ${num}`,t:`${grupo.length} ocupante${grupo.length>1?'s':''}`,cap:CAP,ps:grupo.map(x=>x.nombre)})
-  }
-  if(!ROOMS.length&&!soloDia.length&&!seVan.length){
-    ROOMS.push({n:'Sin asignaciones',t:'Ningún participante con alojamiento asignado',cap:0,ps:[]})
-  }
-  $('hab-lst').innerHTML=ROOMS.map(r=>`
-    <div style="margin-bottom:11px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
-        <div><div style="font-size:12.5px;font-weight:600;color:var(--tx)">${r.n}</div><div style="font-size:10px;color:var(--t3)">${r.t} · ${r.ps.length}/${r.cap||'—'}</div></div>
-        ${r.cap?`<span class="badge ${r.ps.length<r.cap?'b-ok':'b-wn'}">${r.ps.length<r.cap?r.cap-r.ps.length+' libres':'Completa'}</span>`:''}
-      </div>
-      <div style="display:flex;gap:3px;flex-wrap:wrap">
-        ${r.ps.map(n=>`<div title="${n}" class="av" style="background:${col(n)};width:24px;height:24px;font-size:8px;cursor:pointer" onclick="verP('${n}')">${ini(n)}</div>`).join('')}
-      </div>
-      <div style="height:1px;background:var(--bdl);margin-top:9px"></div>
-    </div>`).join('')
-  +(soloDia.length?`<div style="margin-bottom:11px"><div style="font-size:12.5px;font-weight:600;color:var(--tx);margin-bottom:5px">☀️ Solo de día (${soloDia.length})</div><div style="display:flex;gap:3px;flex-wrap:wrap">${soloDia.map(x=>`<div title="${x.nombre}" class="av" style="background:${col(x.nombre)};width:24px;height:24px;font-size:8px;cursor:pointer" onclick="verP('${x.nombre}')">${ini(x.nombre)}</div>`).join('')}</div><div style="height:1px;background:var(--bdl);margin-top:9px"></div></div>`:'')
-  +(seVan.length?`<div style="margin-bottom:11px"><div style="font-size:12.5px;font-weight:600;color:var(--tx);margin-bottom:5px">🚌 Se van antes (${seVan.length})</div><div style="display:flex;gap:3px;flex-wrap:wrap">${seVan.map(x=>`<div title="${x.nombre}" class="av" style="background:${col(x.nombre)};width:24px;height:24px;font-size:8px;cursor:pointer" onclick="verP('${x.nombre}')">${ini(x.nombre)}</div>`).join('')}</div></div>`:'')
-}
-
-// ═══ ORGANIGRAMA ══════════════════════════════════════════════════
-const TAREAS=[
-  {t:'🍳 Cocina',c:'cocina',r:['Coordinador/a','Ayudante 1','Ayudante 2','Ayudante 3']},
-  {t:'🍽 Lavar los platos',c:'platos',r:['Turno mañana','Turno mediodía','Turno noche']},
-  {t:'🧹 Limpieza baños',c:'limpieza',r:['Baño mujeres','Baño hombres','Áreas comunes']},
-  {t:'🗂 Ordenar espacios',c:'orden',r:['Salón principal','Habitaciones','Comedor']},
-  {t:'🎵 Alabanza',c:'alabanza',r:['Líder adoración','Músico/a','Sonido']},
-  {t:'🙏 Oración apertura',c:'oracion',r:['Viernes noche','Sábado mañana','Domingo mañana']},
-  {t:'🚌 Transporte',c:'transporte',r:['Conductor/a 1','Conductor/a 2']},
-  {t:'⚕️ Enfermería',c:'enfermeria',r:['Responsable salud','Apoyo']},
-]
-function rOrg(){
-  const lista=PD()
-  if(!lista.length){
-    $('org-grid').innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--t3);font-size:13px;border:1px dashed var(--bd);border-radius:var(--r)">
-      ${activoIdx<0?'Sin retiro activo — activá o creá uno desde "Mis Retiros"':'Sin participantes registrados — agregá participantes para generar el organigrama'}
-    </div>`
-    return
-  }
-  const sh=[...lista].sort(()=>Math.random()-.5);let idx=0
-  $('org-grid').innerHTML=TAREAS.map(t=>`
-    <div class="oc ${t.c}">
-      <div class="oc-t">${t.t}</div>
-      ${t.r.map(r=>{const p=sh[idx++%sh.length];return`<div class="om"><div class="av" style="background:${col(p.nombre)};width:24px;height:24px;font-size:8px">${ini(p.nombre)}</div><span style="font-size:12px;font-weight:500">${p.nombre}</span><span class="or">${r}</span></div>`}).join('')}
-    </div>`).join('')
-}
-function reasignar(){rOrg();toast('Organigrama reasignado ✓','ok')}
-
-// ═══ COMIDAS ══════════════════════════════════════════════════════
-const CPLAN=[
-  {d:'Viernes',items:[{h:'21:00',n:'Cena bienvenida',desc:'Locro o guiso · Postre',p:28,esp:['Sin gluten x3','Sin lactosa x2','Vegano x1'],ok:true}]},
-  {d:'Sábado',items:[
-    {h:'08:00',n:'Desayuno',desc:'Infusiones, tostadas, mermelada, facturas',p:28,esp:['Sin gluten x3'],ok:true},
-    {h:'10:30',n:'Colación',desc:'Frutas, galletitas',p:28,esp:[],ok:true},
-    {h:'13:30',n:'Almuerzo',desc:'Milanesas / Asado · Ensaladas · Postre',p:28,esp:['Sin gluten x3','Vegano x2','Hiposódico x1'],ok:false},
-    {h:'17:00',n:'Merienda',desc:'Mate, torta, sándwiches',p:28,esp:['Sin gluten x3'],ok:true},
-    {h:'21:00',n:'Cena',desc:'Pizzas caseras · Ensalada',p:28,esp:['Sin gluten x3','Sin lactosa x2'],ok:false},
-  ]},
-  {d:'Domingo',items:[
-    {h:'08:00',n:'Desayuno',desc:'Infusiones, tostadas, facturas',p:26,esp:['Sin gluten x3'],ok:true},
-    {h:'10:30',n:'Colación',desc:'Frutas',p:26,esp:[],ok:true},
-    {h:'13:00',n:'Almuerzo de cierre',desc:'Asado · Ensaladas · Torta · Brindis',p:24,esp:['Sin gluten x3','Vegano x2'],ok:false},
-  ]},
-]
-function rComidas(){
-  const empty=activoIdx<0?'Sin retiro activo':'Sin comidas planificadas aún para este retiro'
-  // Usar comidas del retiro activo si las tiene, sino el plan demo solo para el retiro 0
-  const r=activoIdx>=0?RETIROS[activoIdx]:null
-  const plan=r&&r.participantes&&r.participantes.length?CPLAN:[]
-  if(!plan.length){
-    $('comidas-plan').innerHTML=`<div class="card"><div style="text-align:center;padding:32px;color:var(--t3);font-size:13px">${empty}</div></div>`
-    return
-  }
-  $('comidas-plan').innerHTML=plan.map(d=>`
-    <div class="card mb">
-      <div class="ch"><div><div class="ct">${d.d}</div><div class="cs">${d.items.length} comidas programadas</div></div></div>
-      ${d.items.map(c=>`
-        <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--bdl)">
-          <div style="font-family:var(--f);font-size:14px;font-weight:600;color:var(--go);min-width:45px;flex-shrink:0">${c.h}</div>
-          <div style="flex:1">
-            <div style="font-size:12.5px;font-weight:600;color:var(--tx)">${c.n}</div>
-            <div style="font-size:11px;color:var(--t3);margin-top:1px">${c.desc}</div>
-            ${c.esp.length?`<div style="margin-top:5px;display:flex;gap:3px;flex-wrap:wrap">${c.esp.map(e=>`<span class="tag t-die">${e}</span>`).join('')}</div>`:''}
-          </div>
-          <div style="text-align:right;flex-shrink:0">
-            <div style="font-family:var(--f);font-size:15px;font-weight:600">${c.p}</div>
-            <div style="font-size:9px;color:var(--t3)">porciones</div>
-            <div style="margin-top:3px"><span class="badge ${c.ok?'b-ok':'b-wn'}">${c.ok?'Confirmado':'Pendiente'}</span></div>
-          </div>
-        </div>`).join('')}
-    </div>`).join('')
-}
-
-// ═══ PROGRAMA ══════════════════════════════════════════════════════
-const PROG={
-  vie:[
-    {h:'17:00',a:'Llegada y registro',d:'Acreditación y entrega de materiales',i:'📋'},
-    {h:'18:00',a:'Instalación en habitaciones',d:'Tiempo libre para acomodarse',i:'🛏'},
-    {h:'19:00',a:'Apertura oficial',d:'Bienvenida y presentación del equipo',i:'✞'},
-    {h:'20:00',a:'Alabanza y adoración',d:'Hno. Luis Vera — equipo de adoración',i:'🎵'},
-    {h:'20:45',a:'Mensaje central',d:'Pastor Juan Díaz — "Venir a Sus pies"',i:'📖'},
-    {h:'21:30',a:'Cena bienvenida',d:'Locro compartido — oración de bendición',i:'🍽'},
-    {h:'23:00',a:'Tiempo libre y descanso',d:'',i:'🌙'},
-  ],
-  sab:[
-    {h:'07:30',a:'Oración personal',d:'Tiempo de quietud y lectura bíblica',i:'🙏'},
-    {h:'08:00',a:'Desayuno',d:'',i:'☕'},
-    {h:'09:30',a:'Taller 1: Identidad en Cristo',d:'Diac. María Castro — grupos pequeños',i:'✞'},
-    {h:'10:30',a:'Colación',d:'',i:'🍎'},
-    {h:'11:00',a:'Taller 2: Vida de oración',d:'Continuación en grupos',i:'🙏'},
-    {h:'13:30',a:'Almuerzo',d:'',i:'🍽'},
-    {h:'15:00',a:'Tiempo libre / deporte',d:'Fútbol, caminata, descanso',i:'⚽'},
-    {h:'17:00',a:'Merienda',d:'',i:'🫖'},
-    {h:'18:00',a:'Alabanza',d:'',i:'🎵'},
-    {h:'19:00',a:'Mensaje central',d:'Pastor Juan Díaz — "Renovación"',i:'📖'},
-    {h:'20:00',a:'Intercesión en grupos',d:'',i:'🙏'},
-    {h:'21:00',a:'Cena',d:'',i:'🍽'},
-    {h:'22:30',a:'Fogón espiritual',d:'Testimonios y alabanza libre',i:'🔥'},
-  ],
-  dom:[
-    {h:'07:30',a:'Oración de la mañana',d:'',i:'🙏'},
-    {h:'08:00',a:'Desayuno',d:'',i:'☕'},
-    {h:'09:30',a:'Culto de cierre',d:'Alabanza — Mensaje — Santa Cena',i:'✞'},
-    {h:'11:30',a:'Consagración y bendición',d:'Momento de cierre y compromiso',i:'🙏'},
-    {h:'13:00',a:'Almuerzo de despedida',d:'Asado — testimonios del retiro',i:'🍖'},
-    {h:'15:00',a:'Cierre y regreso',d:'Despedida y entrega de certificados',i:'🚌'},
-  ]
-}
-function showProg(d,btn){
-  if(btn){['pt-v','pt-s','pt-d'].forEach(id=>{$(id)&&$(id).classList.remove('on')});btn.classList.add('on')}
-  const r=activoIdx>=0?RETIROS[activoIdx]:null
-  const tieneParticipantes=r&&r.participantes&&r.participantes.length>0
-  if(!tieneParticipantes){
-    $('prog-sch').innerHTML=`<div style="text-align:center;padding:32px;color:var(--t3);font-size:13px;border:1px dashed var(--bd);border-radius:var(--r)">${activoIdx<0?'Sin retiro activo':'Sin participantes registrados — el programa se habilitará al cargar participantes'}</div>`
-    return
-  }
-  $('prog-sch').innerHTML=(PROG[d]||[]).map(s=>`<div class="si"><div class="sic">${s.i}</div><div style="flex:1"><div class="sa">${s.a}</div>${s.d?`<div class="sd">${s.d}</div>`:''}</div><div class="st">${s.h}</div></div>`).join('')
-}
-
-// ═══ ALERTAS ═══════════════════════════════════════════════════════
-function rAlertas(){
-  const lista=PD()
-  const ALS=[]
-
-  if(!lista.length){
-    $('alert-lst').innerHTML=`<div style="text-align:center;padding:40px;color:var(--t3);font-size:13px;border:1px dashed var(--bd);border-radius:var(--r)">
-      ${activoIdx<0?'Sin retiro activo — activá o creá uno desde "Mis Retiros"':'Sin participantes registrados aún — las alertas aparecerán a medida que cargues los datos'}
-    </div>`
-    // actualizar badge
-    $('ab').textContent='0'
-    return
-  }
-
-  // Medicación
-  const conMeds=lista.filter(p=>p.meds)
-  conMeds.forEach(p=>{
-    ALS.push({i:'💊',c:'ae',tit:`Medicación: ${p.nombre}`,msg:p.meds+(p.notas?` — ${p.notas}`:''),pr:'Alta',ac:['Asignar responsable']})
-  })
-
-  // Alergias
-  const conAler=lista.filter(p=>p.alergias)
-  if(conAler.length){
-    const nombres=conAler.map(p=>p.nombre).join(', ')
-    const tipos=[...new Set(conAler.map(p=>p.alergias).filter(Boolean))].join(' · ')
-    ALS.push({i:'🥗',c:'aw',tit:`Alergias declaradas: ${conAler.length} participante${conAler.length>1?'s':''}`,msg:`${nombres}. Tipos: ${tipos}. Confirmar menú y utensilios separados con cocina.`,pr:'Alta',ac:['Avisar a cocina']})
-  }
-
-  // Pagos pendientes
-  const sinPagar=lista.filter(p=>p.pago!=='paid')
-  if(sinPagar.length){
-    const deuda=sinPagar.reduce((s,p)=>s+(p.total-p.abonado),0)
-    ALS.push({i:'💰',c:'ai',tit:`${sinPagar.length} participante${sinPagar.length>1?'s':''} con pago pendiente`,msg:`Total adeudado: $${deuda.toLocaleString()}. Se recomienda enviar recordatorio.`,pr:'Media',ac:['Ver pagos']})
-  }
-
-  // Se van antes
-  const antes=lista.filter(p=>p.aloj==='antes')
-  if(antes.length){
-    const nombres=antes.map(p=>p.nombre).join(', ')
-    ALS.push({i:'🚌',c:'ai',tit:`${antes.length} participante${antes.length>1?'s':''} se van antes del cierre`,msg:`${nombres}. Coordinar desayuno anticipado y despedida.`,pr:'Media',ac:['Ver alojamiento']})
-  }
-
-  // Alojamiento
-  const duermen=lista.filter(p=>p.aloj==='duerme').length
-  if(duermen>0){
-    ALS.push({i:'🛏',c:'ag',tit:`Alojamiento: ${duermen} duermen, ${lista.filter(p=>p.aloj==='dia').length} solo de día`,msg:'Revisar distribución de habitaciones para confirmar que no haya conflictos de cupo.',pr:'Info',ac:[]})
-  }
-
-  // Badge
-  const urgentes=ALS.filter(a=>a.pr==='Alta').length
-  $('ab').textContent=urgentes||ALS.length
-
-  $('alert-lst').innerHTML=ALS.map(a=>`
-    <div class="al ${a.c}" style="margin-bottom:9px;padding:12px 14px;border-radius:var(--rs)">
-      <span class="al-i">${a.i}</span>
-      <div style="flex:1">
-        <div style="font-weight:700;margin-bottom:3px">${a.tit}</div>
-        <div style="font-size:11.5px;line-height:1.6">${a.msg}</div>
-        ${a.ac.length?`<div style="margin-top:7px;display:flex;gap:5px;flex-wrap:wrap">${a.ac.map(ac=>`<button class="btn bs bsm" style="font-size:11px" onclick="toast('${ac} ✓','ok')">${ac}</button>`).join('')}</div>`:''}
-      </div>
-      <span class="badge ${a.pr==='Alta'?'b-er':a.pr==='Media'?'b-wn':'b-ok'}" style="flex-shrink:0;align-self:flex-start">${a.pr}</span>
-    </div>`).join('')
-}
-
-// ═══ RETIROS STATE ════════════════════════════════════════════════
-let activoIdx = 0
-
-const RETIROS = [
-  {n:'Retiro Jóvenes 2025',   fi:'2025-09-12',ff:'2025-09-14',l:'Casa de Retiros La Paz',   ins:28, costo:20000, cupo:35, st:'activo',  v:'Mateo 11:28',     d:'Renovación espiritual para jóvenes',      participantes:PD_DEMO},
-  {n:'Retiro Matrimonios 2025',fi:'2025-11-07',ff:'2025-11-09',l:'Centro Emaús · Cafayate',  ins:12, costo:25000, cupo:20, st:'planif',  v:'Efesios 5:25',    d:'Fortaleciendo el pacto matrimonial',      participantes:[]},
-  {n:'Retiro Líderes 2024',    fi:'2024-08-03',ff:'2024-08-05',l:'Casa de Retiros La Paz',   ins:18, costo:18000, cupo:25, st:'fin',     v:'Josué 1:9',       d:'Equipando a los siervos de la iglesia',   participantes:[]},
-  {n:'Retiro Jóvenes 2024',    fi:'2024-09-15',ff:'2024-09-17',l:'Hacienda El Algarrobo',    ins:31, costo:18000, cupo:40, st:'fin',     v:'Salmos 23:1',     d:'',                                        participantes:[]},
-  {n:'Retiro Mujeres 2024',    fi:'2024-04-20',ff:'2024-04-21',l:'Parroquia San José',       ins:24, costo:15000, cupo:30, st:'fin',     v:'Proverbios 31:25',d:'',                                        participantes:[]},
-]
-
-// ── función central: refresca TODOS los módulos siempre ──────
-function refreshAll(){
-  syncRetiroActivo()
-  const p=PD()
-  // Stats
-  $('s-tot').textContent=p.length
-  $('s-pag').textContent=p.filter(x=>x.pago==='paid').length
-  $('s-deu').textContent=p.filter(x=>x.pago!=='paid').length
-  $('s-dor').textContent=p.filter(x=>x.aloj==='duerme').length
-  $('s-med').textContent=p.filter(x=>x.meds).length
-  $('s-die').textContent=p.filter(x=>x.dieta).length
-  // Todos los módulos
-  rDashboard(); rPart(); rPagos(); rSalud(); rAloj(); rOrg(); rComidas(); rAlertas()
-  showProg('vie',$('pt-v'))
-  rRetiros()
-  // Badge
-  const _u=p.filter(x=>x.meds).length+((p.filter(x=>x.alergias).length)?1:0)
-  $('ab').textContent=_u||p.filter(x=>x.pago!=='paid'||x.aloj==='antes').length||0
-}
-
-// ── dashboard dinámico ────────────────────────────────────────
-function rDashboard(){
-  const p=PD()
-  const r=activoIdx>=0?RETIROS[activoIdx]:null
-
-  // Título y subtítulo
-  const h1=$('dash-h1'),sub=$('dash-sub')
-  if(h1)h1.textContent=r?'✞ '+r.n:'✞ Sin retiro activo'
-  if(sub)sub.textContent=r?fmtFechas(r.fi,r.ff)+' · '+r.l:'Activá un retiro desde "Mis Retiros"'
-
-  // Versículo
-  const vt=$('dash-versiculo'),vr=$('dash-versiculo-ref')
-  if(r&&r.v){if(vt)vt.textContent=`"${r.v}"`;if(vr)vr.textContent=r.v}
-  else{if(vt)vt.textContent='"Venid a mí todos los que estáis trabajados y cargados, y yo os haré descansar."';if(vr)vr.textContent='Mateo 11:28'}
-
-  // Recaudación
-  const total=r?r.costo*p.length:0
-  const cobrado=p.reduce((s,x)=>s+x.abonado,0)
-  const pagados=p.filter(x=>x.pago==='paid')
-  const parciales=p.filter(x=>x.pago==='partial')
-  const sinPagar=p.filter(x=>x.pago==='nopay')
-  const pct=total>0?Math.round(cobrado/total*100):0
-  const falta=total-cobrado
-  const cs=$('dash-rec-cs');if(cs)cs.textContent=`Total esperado: $${total.toLocaleString()}`
-  const cb=$('dash-cobrado');if(cb)cb.textContent=`$${cobrado.toLocaleString()}`
-  const pf=$('dash-pf');if(pf)pf.style.width=pct+'%'
-  const pc=$('dash-pct');if(pc)pc.textContent=`${pct}% · Faltan $${falta.toLocaleString()}`
-  const pp=$('dash-pr-pag');if(pp)pp.textContent=`✅ Pagados completos (${pagados.length})`
-  const mp=$('dash-monto-pag');if(mp)mp.textContent=`$${pagados.reduce((s,x)=>s+x.abonado,0).toLocaleString()}`
-  const pa=$('dash-pr-par');if(pa)pa.textContent=`⏳ Parciales (${parciales.length})`
-  const ma=$('dash-monto-par');if(ma)ma.textContent=`$${parciales.reduce((s,x)=>s+x.abonado,0).toLocaleString()}`
-  const pn=$('dash-pr-nop');if(pn)pn.textContent=`❌ Sin abonar (${sinPagar.length})`
-  const mn=$('dash-monto-nop');if(mn)mn.textContent=`$${sinPagar.reduce((s,x)=>s+(x.total-x.abonado),0).toLocaleString()}`
-
-  // Alojamiento rápido
-  const dd=$('dash-duerme');if(dd)dd.textContent=p.filter(x=>x.aloj==='duerme').length
-  const di=$('dash-dia');if(di)di.textContent=p.filter(x=>x.aloj==='dia').length
-  const da=$('dash-antes');if(da)da.textContent=p.filter(x=>x.aloj==='antes').length
-
-  // Alertas urgentes (resumen en dashboard)
-  const ab=$('dash-alertas-body'),cs2=$('dash-alerta-cs')
-  if(!p.length){
-    if(ab)ab.innerHTML=`<div style="color:var(--t3);font-size:12px;padding:8px 0">${activoIdx<0?'Sin retiro activo':'Sin participantes — las alertas aparecerán al cargar datos'}</div>`
-    if(cs2)cs2.textContent=''
-    return
-  }
-  const als=[]
-  p.filter(x=>x.meds).forEach(x=>als.push({c:'aw',i:'💊',msg:`<strong>${x.nombre}</strong> — ${x.meds}`}))
-  const ag=p.filter(x=>x.alergias)
-  if(ag.length)als.push({c:'aw',i:'🥗',msg:`<strong>${ag.length} participante${ag.length>1?'s':''}</strong> con alergias: ${[...new Set(ag.map(x=>x.alergias))].join(', ')}`})
-  const sp=p.filter(x=>x.pago!=='paid')
-  if(sp.length)als.push({c:'ai',i:'💰',msg:`<strong>${sp.length} participante${sp.length>1?'s':''}</strong> no abonaron el total`})
-  const ant=p.filter(x=>x.aloj==='antes')
-  if(ant.length)als.push({c:'ai',i:'🚌',msg:`<strong>${ant.map(x=>x.nombre.split(' ')[0]).join(' y ')}</strong> se van antes del cierre`})
-  if(cs2)cs2.textContent=als.length?`${als.length} alerta${als.length>1?'s':''} activa${als.length>1?'s':''}`:'Sin alertas urgentes'
-  if(ab)ab.innerHTML=als.length
-    ?als.slice(0,4).map(a=>`<div class="al ${a.c}"><span class="al-i">${a.i}</span><div>${a.msg}</div></div>`).join('')
-    :`<div class="al ag"><span class="al-i">✅</span><div>Sin alertas urgentes para este retiro.</div></div>`
-
-  // Últimas inscripciones
-  const tb=$('dash-tbody')
-  if(tb){
-    const ult=p.slice(-3).reverse()
-    tb.innerHTML=ult.length?ult.map(x=>`<tr>
-      <td><div class="pn"><div class="av" style="background:${col(x.nombre)};width:28px;height:28px;font-size:10px">${ini(x.nombre)}</div><div><div class="pnf">${x.nombre}</div><div class="pns">${x.iglesia||'—'}</div></div></div></td>
-      <td>${pagoTag(x)}</td><td>${alojBadge(x)}</td>
-      <td><button class="btn bs bsm" onclick="verP('${x.nombre.replace(/'/g,"\\'")}')">Ver</button></td>
-    </tr>`).join(''):`<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--t3);font-size:12px">Sin participantes aún</td></tr>`
-  }
-}
-
-// ── helpers ────────────────────────────────────────────────────
-function fmtFechas(fi,ff){
-  if(!fi)return '—'
-  const parse=s=>{const[y,m,d]=s.split('-');return{y,m,d}}
-  const MESES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
-  const a=parse(fi);const b=ff?parse(ff):null
-  if(!b||a.m===b.m)return`${a.d}–${b?b.d:'?'} ${MESES[+a.m-1]} ${a.y}`
-  return`${a.d} ${MESES[+a.m-1]} – ${b.d} ${MESES[+b.m-1]} ${a.y}`
-}
-
-// ── actualizar sidebar & dashboard con retiro activo ──────────
-function syncRetiroActivo(){
-  const ret=$('sb-ret-box')
-  const r=activoIdx>=0?RETIROS[activoIdx]:null
-  if(r){
-    ret.className='sb-ret'
-    ret.onclick=()=>nav('dashboard')
-    ret.innerHTML=`<div class="sb-rn" id="sb-rn">${r.n}</div><div class="sb-rd" id="sb-rd">${fmtFechas(r.fi,r.ff)} · ${r.l}</div>`
-  } else {
-    ret.className='sb-ret-empty'
-    ret.onclick=()=>{nav('retiros')}
-    ret.innerHTML=`<div class="sb-ret-empty-txt">Sin retiro activo</div><div class="sb-ret-empty-btn">＋ Crear o activar uno →</div>`
-  }
-}
-
-// ── render Mis Retiros ────────────────────────────────────────
-function rRetiros(){
-  $('ret-grid').innerHTML=RETIROS.map((r,i)=>{
-    const isActivo=i===activoIdx
-    const stLabel=isActivo?'Activo':r.st==='planif'?'Planificando':'Finalizado'
-    const stClass=isActivo?'b-ok':r.st==='planif'?'b-wn':'b-ne'
-    return`
-    <div class="card" style="cursor:default;transition:transform .15s,box-shadow .15s;${isActivo?'border-color:var(--go);box-shadow:0 0 0 2px rgba(184,151,42,.18),var(--sh)':''}"
-      onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='var(--shm)'"
-      onmouseout="this.style.transform='';this.style.boxShadow='${isActivo?'0 0 0 2px rgba(184,151,42,.18),var(--sh)':''}'"
+// ════════════════════════════════════════════════════════════════
+// SIDEBAR
+// ════════════════════════════════════════════════════════════════
+function buildSidebar() {
+  const el = $('sb-rets')
+  el.innerHTML = RETIROS.map(r => {
+    const p = r.participantes
+    const active = r.id===ACTIVO_ID
+    const stColors = {Activo:'var(--ok)',Planificando:'var(--wn)',Finalizado:'var(--t3)'}
+    const stBadgeC = {Activo:'b-ok',Planificando:'b-wn',Finalizado:'b-ne'}
+    return `<div class="sb-ret-item${active?' active':''}"
+      onclick="setRetiro('${r.id}')"
+      style="${active?`background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.22)`:''}"
     >
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;gap:8px">
-        <div style="font-family:var(--f);font-size:15px;font-weight:600;color:var(--tx);line-height:1.2">${r.n}</div>
-        <span class="badge ${stClass}" style="flex-shrink:0">${stLabel}</span>
-      </div>
-      <div style="font-size:11px;color:var(--t3);margin-bottom:3px">📅 ${fmtFechas(r.fi,r.ff)}</div>
-      <div style="font-size:11px;color:var(--t3);margin-bottom:10px">📍 ${r.l}</div>
-      ${r.v?`<div style="font-size:11px;font-style:italic;color:var(--brl);background:var(--cr);padding:7px 10px;border-radius:var(--rx);border-left:3px solid var(--go);margin-bottom:10px">"${r.v}"</div>`:''}
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <span style="font-family:var(--f);font-size:17px;font-weight:600">${(r.participantes||[]).length}<span style="font-size:11px;font-weight:400;color:var(--t3);font-family:var(--s)"> participantes</span></span>
-        ${r.costo?`<span style="font-size:11px;color:var(--t3)">$${r.costo.toLocaleString()}/persona</span>`:''}
-      </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        ${isActivo
-          ? `<button class="btn bs bsm" style="flex:1" onclick="cerrarRetiro(${i})">🔒 Cerrar retiro</button>
-             <button class="btn bp bsm" onclick="nav('dashboard')">Ver →</button>
-             <button class="btn bs bsm bic" onclick="editRetiro(${i})" title="Editar datos">✏️</button>`
-          : `<button class="btn bs bsm" style="flex:1" onclick="activarRetiro(${i})">
-               ${r.st==='fin'?'📂 Reabrir':'✞ Activar'}
-             </button>
-             <button class="btn bs bsm bic" onclick="editRetiro(${i})" title="Editar datos">✏️</button>
-             <button class="btn bd2 bsm bic" onclick="eliminarRetiro(${i})" title="Eliminar">🗑</button>`
-        }
-      </div>
+      <div class="sb-ret-dot" style="background:#${r.cs.accent}"></div>
+      <span class="sb-ret-name">${r.icono} ${r.nombre}</span>
+      <span class="badge ${stBadgeC[r.estado]}" style="font-size:8px">${r.estado==='Activo'?p.length:'—'}</span>
     </div>`
   }).join('')
-}
-
-// ── editar datos básicos de un retiro ─────────────────────────
-let _editIdx = -1
-function editRetiro(i){
-  const r=RETIROS[i]
-  _editIdx=i
-  $('er-n').value=r.n
-  $('er-fi').value=r.fi||''
-  $('er-ff').value=r.ff||''
-  $('er-l').value=r.l||''
-  $('er-c').value=r.costo||''
-  $('er-q').value=r.cupo||''
-  $('er-v').value=r.v||''
-  $('er-d').value=r.d||''
-  openM('m-edit-ret')
-}
-function guardarEditRetiro(){
-  const n=$('er-n').value.trim()
-  if(!n){toast('El nombre no puede estar vacío','wn');return}
-  const r=RETIROS[_editIdx]
-  r.n=$('er-n').value.trim()
-  r.fi=$('er-fi').value
-  r.ff=$('er-ff').value
-  r.l=$('er-l').value.trim()
-  r.costo=parseInt($('er-c').value)||0
-  r.cupo=parseInt($('er-q').value)||0
-  r.v=$('er-v').value.trim()
-  r.d=$('er-d').value.trim()
-  closeM('m-edit-ret')
-  syncRetiroActivo()
-  rRetiros()
-  toast(`"${r.n}" actualizado ✓`,'ok')
-}
-
-// ── eliminar retiro ───────────────────────────────────────────
-function eliminarRetiro(i){
-  if(!confirm(`¿Eliminar "${RETIROS[i].n}"? Esta acción no se puede deshacer.`))return
-  if(activoIdx===i)activoIdx=-1
-  else if(activoIdx>i)activoIdx--
-  RETIROS.splice(i,1)
-  syncRetiroActivo()
-  refreshAll()
-  rRetiros()
-  toast('Retiro eliminado','er')
-}
-
-// ── crear nuevo retiro ────────────────────────────────────────
-function addRetiro(){
-  const n=$('nr-n').value.trim()
-  if(!n){toast('Ingresá el nombre del retiro','wn');return}
-  const fi=$('nr-fi').value
-  const ff=$('nr-ff').value
-  const l=$('nr-l').value.trim()
-  const c=parseInt($('nr-c').value)||0
-  const q=parseInt($('nr-q').value)||0
-  const v=$('nr-v').value.trim()
-  const d=$('nr-d').value.trim()
-
-  // Si hay uno activo, cerrarlo
-  if(activoIdx>=0) RETIROS[activoIdx].st='fin'
-
-  // El nuevo retiro empieza sin participantes (lista limpia)
-  const nuevo={n,fi,ff,l,ins:0,costo:c,cupo:q,st:'activo',v,d,participantes:[]}
-  RETIROS.unshift(nuevo)
-  activoIdx=0
-
-  ;['nr-n','nr-fi','nr-ff','nr-l','nr-c','nr-q','nr-v','nr-d'].forEach(id=>{const el=$(id);if(el)el.value=''})
-  closeM('m-ret')
-  syncRetiroActivo()
-  refreshAll()
-  rRetiros()
-  toast(`"${n}" creado y activado ✓`,'ok')
-}
-
-// ── activar retiro (actualizado con refreshAll) ───────────────
-function activarRetiro(i){
-  const r=RETIROS[i]
-  if(activoIdx>=0 && activoIdx!==i) RETIROS[activoIdx].st='fin'
-  activoIdx=i
-  RETIROS[i].st='activo'
-  syncRetiroActivo()
-  refreshAll()
-  rRetiros()
-  toast(`"${r.n}" activado ✓`,'ok')
-}
-
-// ── cerrar retiro (actualizado con refreshAll) ────────────────
-function cerrarRetiro(i){
-  RETIROS[i].st='fin'
-  activoIdx=-1
-  syncRetiroActivo()
-  refreshAll()
-  rRetiros()
-  toast('Retiro cerrado. Podés crear o activar otro.','wn')
-}
-
-// ═══ ADD PARTICIPANT ══════════════════════════════════════════════
-function addPart(){
-  if(activoIdx<0){toast('No hay retiro activo. Activá uno primero.','wn');return}
-  const n=$('np-n').value.trim()
-  if(!n){toast('Ingresá el nombre','wn');return}
-  const c=$('np-c').value.trim()
-  const pg=$('np-pg').value
-  const m=parseInt($('np-m').value)||0
-  const al=$('np-al').value
-  const lista=RETIROS[activoIdx].participantes
-  lista.push({id:lista.length+1,nombre:n,cel:c,iglesia:'',edad:0,pago:pg,abonado:m,total:RETIROS[activoIdx].costo||20000,aloj:al,meds:'',dieta:'',alergias:'',cond:'',notas:''})
-  RETIROS[activoIdx].ins=lista.length
-  closeM('m-np')
-  $('np-n').value='';$('np-c').value='';$('np-m').value=''
-  refreshAll()
-  if(document.querySelector('#p-part.on'))rPart()
-  toast(`${n} inscripto ✓`,'ok')
-}
-
-// ═══ COORDINADOR EDITABLE ═════════════════════════════════════════
-function editCoord(){
-  const el=$('sb-un')
-  const actual=el.textContent.trim()
-  const input=document.createElement('input')
-  input.value=actual
-  input.style.cssText='background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:4px;color:#FAF7F2;font-size:12px;font-family:var(--s);font-weight:500;padding:3px 7px;width:140px;outline:none'
-  el.replaceWith(input)
-  input.focus();input.select()
-  const guardar=()=>{
-    const v=input.value.trim()||actual
-    const nuevo=document.createElement('div')
-    nuevo.className='sb-un';nuevo.id='sb-un';nuevo.textContent=v
-    input.replaceWith(nuevo)
-    // Actualizar avatar con inicial
-    const av=$('sb-av')
-    if(av)av.textContent=v[0].toUpperCase()
-    toast(`Coordinador actualizado: ${v}`,'ok')
-  }
-  input.addEventListener('blur',guardar)
-  input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();guardar()}if(e.key==='Escape'){input.value=actual;guardar()}})
-}
-
-// ═══ KEYBOARD ═════════════════════════════════════════════════════
-document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.mo.on').forEach(m=>m.classList.remove('on'))})
-
-// ═══ INIT ══════════════════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded',()=>{
-  syncRetiroActivo()
-  refreshAll()
-  let d=0
-  document.querySelectorAll('.sc,.card').forEach(el=>{
-    el.style.opacity='0';el.style.transform='translateY(5px)'
-    setTimeout(()=>{el.style.transition='opacity .28s ease,transform .28s ease';el.style.opacity='1';el.style.transform='translateY(0)'},d)
-    d+=25
+  // Nav item colors
+  document.querySelectorAll('.ni').forEach(n=>{
+    n.style.setProperty('--ni-on-bg','#'+cs().med)
   })
+  document.querySelectorAll('.ni.on').forEach(n=>{
+    n.style.background='rgba(255,255,255,.12)'
+  })
+  // Avatar
+  const av = $('sb-av'); if(av) av.style.background='#'+cs().accent
+}
+
+// ════════════════════════════════════════════════════════════════
+// CELL CHANGE — reactive core
+// ════════════════════════════════════════════════════════════════
+function onCell(rid, pid, field, value) {
+  const r = RETIROS.find(x=>x.id===rid)
+  const p = r.participantes.find(x=>x.id===pid)
+  if(!p) return
+  if(['ed','ab','to'].includes(field)) value = parseInt(value)||0
+  p[field] = value
+  if(field==='ab') {
+    if(p.ab<=0)        p.pg='Sin pagar'
+    else if(p.ab>=p.to) p.pg='Pagado'
+    else                p.pg='Parcial'
+  }
+  if(field==='pg'&&value==='Pagado') p.ab=p.to
+  refreshAll()
+  save()
+}
+
+// ════════════════════════════════════════════════════════════════
+// SEMAPHORE HELPERS
+// ════════════════════════════════════════════════════════════════
+function semPago(pg) { return pg==='Pagado'?'s-ok':pg==='Parcial'?'s-warn':'s-err' }
+function semAloj(al) { return al==='Duerme'?'s-blue':al==='Solo día'?'s-warn':'s-err' }
+function semMonto(ab,to) { return ab>=to?'s-ok':ab>0?'s-warn':'s-err' }
+function rowClass(p) { return p.pg==='Pagado'?'rp':p.pg==='Sin pagar'?'rn2':'' }
+function alojRowClass(p) { return p.al==='Duerme'?'rd':p.al==='Se va antes'?'ra':'rs' }
+
+// ════════════════════════════════════════════════════════════════
+// CELL BUILDERS
+// ════════════════════════════════════════════════════════════════
+function cellTxt(rid,pid,f,v,sem='',style='') {
+  const val = String(v||'').replace(/"/g,'&quot;').replace(/'/g,'&#39;')
+  return `<input class="xcel${sem?' '+sem:''}" style="${style}" value="${val}"
+    onchange="onCell('${rid}',${pid},'${f}',this.value)"
+    onfocus="this.select()">`
+}
+function cellNum(rid,pid,f,v,sem='') {
+  return `<input class="xcel${sem?' '+sem:''}" type="number" value="${v||0}" style="text-align:right"
+    onchange="onCell('${rid}',${pid},'${f}',this.value)"
+    onfocus="this.select()">`
+}
+function cellSel(rid,pid,f,v,opts,sem='') {
+  const os = opts.map(o=>`<option${o===v?' selected':''}>${o}</option>`).join('')
+  return `<select class="xcel${sem?' '+sem:''}" onchange="onCell('${rid}',${pid},'${f}',this.value)">${os}</select>`
+}
+function avDiv(n,w=24) {
+  return `<div class="av" style="background:${colFor(n)};width:${w}px;height:${w}px;font-size:${Math.floor(w*0.38)}px">${ini(n)||'?'}</div>`
+}
+
+// ════════════════════════════════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════════════════════════════════
+function rDash() {
+  const r = ret(); if(!r) return
+  const p = r.participantes
+  const c = cs()
+  const paid  = p.filter(x=>x.pg==='Pagado')
+  const debt  = p.filter(x=>x.pg!=='Pagado')
+  const slp   = p.filter(x=>x.al==='Duerme')
+  const meds  = p.filter(x=>x.me)
+  const diets = p.filter(x=>x.di)
+  const total = p.reduce((s,x)=>s+x.to,0)
+  const cob   = p.reduce((s,x)=>s+x.ab,0)
+  const pp    = pct(cob,total)
+  const falta = total-cob
+
+  // Banner
+  const bn = $('dash-banner')
+  bn.style.background=`#${c.main}`;bn.style.color=`#${c.htxt}`
+  $('dash-h1').textContent=`${r.icono}  ${r.nombre}`
+  $('dash-sub').textContent=`${r.fechas}  ·  ${r.lugar}`
+  $('dash-vs').textContent=`"${r.versiculo}"`
+
+  // KPIs
+  const kd=[
+    {i:'👥',v:p.length,l:'Inscriptos',nav:'datos'},
+    {i:'✅',v:paid.length,l:'Pagados',nav:'pagos'},
+    {i:'⏳',v:debt.length,l:'Con deuda',nav:'pagos'},
+    {i:'🛏',v:slp.length,l:'Duermen',nav:'aloj'},
+    {i:'💊',v:meds.length,l:'Medicación',nav:'salud'},
+    {i:'🥗',v:diets.length,l:'Dieta especial',nav:'salud'},
+  ]
+  const kColors=[c.main,c.med,c.main,c.med,c.accent,c.med]
+  $('dash-kpis').innerHTML=kd.map((k,i)=>`<div class="kpi" onclick="nav('${k.nav}')" style="background:#${kColors[i]}">
+    <div class="kpi-i">${k.i}</div>
+    <div class="kpi-v">${k.v}</div>
+    <div class="kpi-l">${k.l}</div>
+  </div>`).join('')
+
+  // Recaud
+  $('dash-rec').innerHTML=`
+    <div class="rec-row" style="background:var(--okb)"><span class="rec-lbl" style="color:var(--ok)">✅ Pagados (${paid.length})</span><span class="rec-val" style="color:var(--ok)">${fmt$(paid.reduce((s,x)=>s+x.ab,0))}</span></div>
+    <div class="rec-row" style="background:var(--wnb)"><span class="rec-lbl" style="color:var(--wn)">⏳ Parciales (${p.filter(x=>x.pg==='Parcial').length})</span><span class="rec-val" style="color:var(--wn)">${fmt$(p.filter(x=>x.pg==='Parcial').reduce((s,x)=>s+x.ab,0))}</span></div>
+    <div class="rec-row" style="background:var(--erb)"><span class="rec-lbl" style="color:var(--er)">❌ Sin abonar (${p.filter(x=>x.pg==='Sin pagar').length})</span><span class="rec-val" style="color:var(--er)">${fmt$(p.filter(x=>x.pg==='Sin pagar').reduce((s,x)=>s+(x.to-x.ab),0))}</span></div>
+  `
+  $('dash-pf').style.width=pp+'%'
+  $('dash-pf').style.background=`#${c.accent}`
+  $('dash-pct-lbl').textContent=`${pp}% · Total esperado ${fmt$(total)} · Cobrado ${fmt$(cob)} · Faltan ${fmt$(falta)}`
+
+  // Alertas
+  const als=[]
+  if(meds.length) als.push({c:'aw',i:'💊',m:`<strong>${meds.length} participante${meds.length>1?'s':''}</strong> con medicación — verificar horarios y refrigeración.`})
+  const alerg=p.filter(x=>x.ae||x.ko?.toLowerCase().includes('alergi'))
+  if(alerg.length) als.push({c:'aw',i:'🥗',m:`<strong>Alergias/condiciones</strong>: ${alerg.slice(0,3).map(x=>x.n.split(' ')[0]).join(', ')}${alerg.length>3?'...':''}.`})
+  if(debt.length) als.push({c:'ae',i:'💰',m:`<strong>${debt.length} participante${debt.length>1?'s':''}</strong> con pago pendiente. Total: ${fmt$(falta)}.`})
+  const antes=p.filter(x=>x.al==='Se va antes')
+  if(antes.length) als.push({c:'ai',i:'🚌',m:`<strong>${antes.slice(0,2).map(x=>x.n.split(' ')[0]).join(' y ')}</strong> se van antes del cierre.`})
+  if(!als.length) als.push({c:'ag',i:'✅',m:'Sin alertas urgentes. Todo en orden.'})
+  $('dash-alertas').innerHTML=als.map(a=>`<div class="al ${a.c}"><span style="font-size:14px">${a.i}</span><div>${a.m}</div></div>`).join('')
+
+  // Aloj rápido
+  $('dash-aloj').innerHTML=`
+    <div style="display:flex;gap:7px">
+      <div style="flex:1;text-align:center;padding:10px;background:var(--blb);border-radius:5px"><div style="font-family:var(--f);font-size:20px;font-weight:600;color:var(--bl)">${slp.length}</div><div style="font-size:10px;color:var(--bl)">Duermen</div></div>
+      <div style="flex:1;text-align:center;padding:10px;background:var(--wnb);border-radius:5px"><div style="font-family:var(--f);font-size:20px;font-weight:600;color:var(--wn)">${p.filter(x=>x.al==='Solo día').length}</div><div style="font-size:10px;color:var(--wn)">Solo día</div></div>
+      <div style="flex:1;text-align:center;padding:10px;background:var(--erb);border-radius:5px"><div style="font-family:var(--f);font-size:20px;font-weight:600;color:var(--er)">${antes.length}</div><div style="font-size:10px;color:var(--er)">Se van antes</div></div>
+    </div>`
+
+  // Medicación
+  $('dash-meds').innerHTML=meds.length
+    ?meds.map(p=>`<div style="display:flex;gap:6px;align-items:flex-start;padding:4px 0;border-bottom:1px solid var(--bdl)">${avDiv(p.n,22)}<div><div style="font-size:11px;font-weight:500">${p.n}</div><div style="font-size:10px;color:var(--wn)">${p.me}</div></div></div>`).join('')
+    :'<div style="color:var(--t3);font-size:11px">Sin medicación registrada</div>'
+
+  // Versículo
+  $('dash-vbox').style.background=`#${c.main}`
+  $('dash-vbox-txt').textContent=`"${r.versiculo}"`
+  $('dash-vbox-ref').textContent=r.versiculo
+
+  // Últimas inscripciones
+  $('dash-ultimos').innerHTML=p.slice(-5).reverse().map(pp=>`
+    <div style="display:flex;align-items:center;gap:7px;padding:4px 0;border-bottom:1px solid var(--bdl)">
+      ${avDiv(pp.n,24)}<div style="flex:1"><div style="font-size:11px;font-weight:500">${pp.n}</div><div style="font-size:10px;color:var(--t3)">${pp.ig}</div></div>
+      <span class="badge ${pp.pg==='Pagado'?'b-ok':pp.pg==='Parcial'?'b-wn':'b-er'}">${pp.pg}</span>
+    </div>`).join('')||'<div style="color:var(--t3);font-size:11px">Sin participantes</div>'
+}
+
+// ════════════════════════════════════════════════════════════════
+// PARTICIPANTES TABLE
+// ════════════════════════════════════════════════════════════════
+function rDatos() {
+  const r=ret(); if(!r) return
+  const c=cs()
+  let list=r.participantes
+  if(partFilter==='Pagado'||partFilter==='Parcial'||partFilter==='Sin pagar') list=list.filter(p=>p.pg===partFilter)
+  else if(partFilter==='Duerme') list=list.filter(p=>p.al==='Duerme')
+  else if(partFilter==='med')    list=list.filter(p=>p.me)
+  $('datos-sub').textContent=`${list.length} de ${r.participantes.length} participantes · ${r.nombre}`
+  const thStyle=`background:#${c.med}`
+  $('datos-thead').innerHTML=`<tr>
+    <th class="rn" style="${thStyle}">#</th>
+    <th class="tl" style="${thStyle};min-width:170px">Nombre</th>
+    <th style="${thStyle};min-width:120px">Celular</th>
+    <th style="${thStyle};min-width:110px">Iglesia</th>
+    <th style="${thStyle};width:52px">Edad</th>
+    <th style="${thStyle};min-width:100px">Estado pago</th>
+    <th style="${thStyle};min-width:95px">Abonado ($)</th>
+    <th style="${thStyle};min-width:95px">Total ($)</th>
+    <th style="${thStyle};min-width:95px">Alojamiento</th>
+    <th style="${thStyle};min-width:170px">Medicamentos</th>
+    <th style="${thStyle};min-width:110px">Dieta</th>
+    <th style="${thStyle};min-width:130px">Condición médica</th>
+    <th style="${thStyle};min-width:130px">Notas</th>
+    <th style="${thStyle};width:40px"></th>
+  </tr>`
+  $('datos-tbody').innerHTML=list.map((p,i)=>`
+    <tr class="${rowClass(p)}">
+      <td class="row-num">${i+1}</td>
+      <td style="min-width:170px">${avDiv(p.n,20)}<span style="display:inline-block;vertical-align:middle">${cellTxt(r.id,p.id,'n',p.n,'','font-weight:500;width:calc(100% - 28px);display:inline-block;vertical-align:middle')}</span></td>
+      <td>${cellTxt(r.id,p.id,'c',p.c)}</td>
+      <td>${cellTxt(r.id,p.id,'ig',p.ig)}</td>
+      <td>${cellNum(r.id,p.id,'ed',p.ed,'','')}</td>
+      <td>${cellSel(r.id,p.id,'pg',p.pg,['Pagado','Parcial','Sin pagar'],semPago(p.pg))}</td>
+      <td>${cellNum(r.id,p.id,'ab',p.ab,semMonto(p.ab,p.to))}</td>
+      <td>${cellNum(r.id,p.id,'to',p.to)}</td>
+      <td>${cellSel(r.id,p.id,'al',p.al,['Duerme','Solo día','Se va antes'],semAloj(p.al))}</td>
+      <td>${cellTxt(r.id,p.id,'me',p.me,p.me?'s-med':'')}</td>
+      <td>${cellSel(r.id,p.id,'di',p.di,['','Sin gluten','Sin lactosa','Vegetariano','Vegano','Diabético','Hiposódico','Otra'],p.di?'s-diet':'')}</td>
+      <td>${cellTxt(r.id,p.id,'ko',p.ko,p.ko?'s-cond':'')}</td>
+      <td>${cellTxt(r.id,p.id,'no',p.no)}</td>
+      <td style="text-align:center;padding:0 4px"><button class="btn bd2 bsm" style="padding:3px 6px;font-size:10px" onclick="delPart('${r.id}',${p.id})">✕</button></td>
+    </tr>`).join('')||`<tr><td colspan="14" style="text-align:center;padding:28px;color:var(--t3)">Sin participantes que coincidan con el filtro</td></tr>`
+}
+
+function setFilter(btn,f) {
+  partFilter=f
+  btn.closest('.ft').querySelectorAll('.ftb').forEach(b=>b.classList.remove('on'))
+  btn.classList.add('on')
+  rDatos()
+}
+
+// ════════════════════════════════════════════════════════════════
+// PAGOS TABLE
+// ════════════════════════════════════════════════════════════════
+function rPagos() {
+  const r=ret(); if(!r) return
+  const c=cs(); const p=r.participantes
+  const total=p.reduce((s,x)=>s+x.to,0)
+  const cob=p.reduce((s,x)=>s+x.ab,0)
+  const pp=pct(cob,total)
+  $('pagos-sub').textContent=`Costo: $${r.costo.toLocaleString('es-AR')}/pers · ${p.length} participantes · ${r.nombre}`
+  $('pagos-resumen').innerHTML=`
+    <div class="rec-row" style="background:var(--cr2)"><span class="rec-lbl">Total esperado</span><span class="rec-val">${fmt$(total)}</span></div>
+    <div class="rec-row" style="background:var(--okb)"><span class="rec-lbl" style="color:var(--ok)">Cobrado</span><span class="rec-val" style="color:var(--ok)">${fmt$(cob)}</span></div>
+    <div class="rec-row" style="background:var(--erb)"><span class="rec-lbl" style="color:var(--er)">Pendiente</span><span class="rec-val" style="color:var(--er)">${fmt$(total-cob)}</span></div>`
+  $('pagos-pct').textContent=pp+'%'
+  $('pagos-prog').style.width=pp+'%'
+  $('pagos-prog').style.background=pp>=100?'var(--ok)':pp<30?'var(--er)':`#${c.accent}`
+  const thS=`background:#${c.med}`
+  $('pagos-thead').innerHTML=`<tr>
+    <th class="rn" style="${thS}">#</th>
+    <th class="tl" style="${thS};min-width:170px">Participante</th>
+    <th style="${thS};min-width:100px">Iglesia</th>
+    <th style="${thS};min-width:95px">Abonado ($)</th>
+    <th style="${thS};min-width:95px">Total ($)</th>
+    <th style="${thS};min-width:90px">Resta ($)</th>
+    <th style="${thS};min-width:120px">% Abonado</th>
+    <th style="${thS};min-width:95px">Estado</th>
+    <th style="${thS};min-width:100px">Últ. pago</th>
+  </tr>`
+  $('pagos-tbody').innerHTML=p.map((pp,i)=>{
+    const resta=pp.to-pp.ab; const ppct=pct(pp.ab,pp.to)
+    const pColor=ppct>=100?'var(--ok)':ppct>0?'var(--wn)':'var(--er)'
+    return `<tr class="${rowClass(pp)}">
+      <td class="row-num">${i+1}</td>
+      <td>${avDiv(pp.n,20)} <span style="font-size:11.5px;font-weight:500;vertical-align:middle">${pp.n}</span></td>
+      <td><span class="xcel" style="display:block;padding:6px 8px">${pp.ig}</span></td>
+      <td>${cellNum(r.id,pp.id,'ab',pp.ab,semMonto(pp.ab,pp.to))}</td>
+      <td>${cellNum(r.id,pp.id,'to',pp.to)}</td>
+      <td style="padding:6px 8px;font-family:var(--f);font-weight:600;text-align:right;background:${resta>0?'var(--erb)':'var(--okb)'};color:${resta>0?'var(--er)':'var(--ok)'}">$${resta.toLocaleString('es-AR')}</td>
+      <td style="padding:4px 8px">
+        <div style="display:flex;align-items:center;gap:5px">
+          <div style="flex:1;height:5px;background:var(--cr3);border-radius:99px;overflow:hidden">
+            <div style="height:100%;width:${ppct}%;background:${pColor};border-radius:99px;transition:width .3s"></div>
+          </div>
+          <span style="font-size:10px;font-weight:600;color:${pColor};min-width:26px">${ppct}%</span>
+        </div>
+      </td>
+      <td>${cellSel(r.id,pp.id,'pg',pp.pg,['Pagado','Parcial','Sin pagar'],semPago(pp.pg))}</td>
+      <td style="padding:6px 8px;font-size:11px;color:var(--t3)">${pp.ab>0?'Sep 2025':'—'}</td>
+    </tr>`}).join('')||'<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--t3)">Sin participantes</td></tr>'
+}
+
+// ════════════════════════════════════════════════════════════════
+// SALUD TABLE
+// ════════════════════════════════════════════════════════════════
+function rSalud() {
+  const r=ret(); if(!r) return
+  const c=cs(); let p=r.participantes
+  if(saludFilter==='med')   p=p.filter(x=>x.me)
+  else if(saludFilter==='diet')  p=p.filter(x=>x.di)
+  else if(saludFilter==='alerg') p=p.filter(x=>x.ae||x.ko?.toLowerCase().includes('alergi'))
+  else if(saludFilter==='cond')  p=p.filter(x=>x.ko)
+  const thS=`background:#${c.med}`
+  $('salud-thead').innerHTML=`<tr>
+    <th class="rn" style="${thS}">#</th>
+    <th class="tl" style="${thS};min-width:170px">Participante</th>
+    <th style="${thS};min-width:210px;text-align:left">Medicamentos</th>
+    <th style="${thS};min-width:110px">Dieta</th>
+    <th style="${thS};min-width:120px">Alergias</th>
+    <th style="${thS};min-width:150px">Condición médica</th>
+    <th style="${thS};min-width:140px">Notas</th>
+  </tr>`
+  $('salud-tbody').innerHTML=p.map((pp,i)=>`
+    <tr style="${pp.me?'background:var(--wnb)':''}">
+      <td class="row-num">${i+1}</td>
+      <td>${avDiv(pp.n,20)} <span style="font-size:11.5px;font-weight:500;vertical-align:middle">${pp.n}</span></td>
+      <td>${cellTxt(r.id,pp.id,'me',pp.me,pp.me?'s-med':'')}</td>
+      <td>${cellSel(r.id,pp.id,'di',pp.di,['','Sin gluten','Sin lactosa','Vegetariano','Vegano','Diabético','Hiposódico','Otra'],pp.di?'s-diet':'')}</td>
+      <td>${cellTxt(r.id,pp.id,'ae',pp.ae,pp.ae?'s-cond':'')}</td>
+      <td>${cellTxt(r.id,pp.id,'ko',pp.ko,pp.ko?'s-cond':'')}</td>
+      <td>${cellTxt(r.id,pp.id,'no',pp.no)}</td>
+    </tr>`).join('')||'<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--t3)">Sin registros para este filtro</td></tr>'
+}
+
+function setSaludFilter(btn,f){saludFilter=f;btn.closest('.ft').querySelectorAll('.ftb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');rSalud()}
+
+// ════════════════════════════════════════════════════════════════
+// ALOJAMIENTO
+// ════════════════════════════════════════════════════════════════
+function rAloj() {
+  const r=ret(); if(!r) return
+  const c=cs(); const p=r.participantes
+  const dur=p.filter(x=>x.al==='Duerme')
+  const dia=p.filter(x=>x.al==='Solo día')
+  const ant=p.filter(x=>x.al==='Se va antes')
+  const habs=Math.ceil(dur.length/6)||0
+  const kc=[c.main,c.med,c.main,c.med]
+  $('aloj-kpis').innerHTML=[
+    {i:'🛏',v:dur.length,l:'Duermen'},
+    {i:'☀️',v:dia.length,l:'Solo día'},
+    {i:'🚪',v:ant.length,l:'Se van antes'},
+    {i:'🏠',v:habs,l:'Habitaciones'},
+  ].map((k,i)=>`<div class="kpi" style="background:#${kc[i]}"><div class="kpi-i">${k.i}</div><div class="kpi-v">${k.v}</div><div class="kpi-l">${k.l}</div></div>`).join('')
+  // Hab map
+  const habMap={}; dur.forEach((pp,i)=>{habMap[pp.id]=`Hab. ${Math.floor(i/6)+1}`})
+  const thS=`background:#${c.med}`
+  $('aloj-thead').innerHTML=`<tr>
+    <th class="rn" style="${thS}">#</th>
+    <th class="tl" style="${thS};min-width:150px">Participante</th>
+    <th style="${thS};min-width:95px">Alojamiento</th>
+    <th style="${thS};min-width:80px">Habitación</th>
+    <th style="${thS};min-width:100px">Llega</th>
+    <th style="${thS};min-width:100px">Se va</th>
+    <th style="${thS};min-width:150px">Observaciones</th>
+  </tr>`
+  $('aloj-tbody').innerHTML=p.map((pp,i)=>`
+    <tr class="${alojRowClass(pp)}">
+      <td class="row-num">${i+1}</td>
+      <td>${avDiv(pp.n,20)} <span style="font-size:11.5px;font-weight:500;vertical-align:middle">${pp.n}</span></td>
+      <td>${cellSel(r.id,pp.id,'al',pp.al,['Duerme','Solo día','Se va antes'],semAloj(pp.al))}</td>
+      <td style="padding:6px 8px;font-size:11px;text-align:center;font-weight:600;color:var(--bl)">${habMap[pp.id]||'—'}</td>
+      <td style="padding:6px 8px;font-size:11px;color:var(--t3)">Vie 17:00</td>
+      <td style="padding:6px 8px;font-size:11px;color:var(--t3)">${pp.al==='Duerme'?'Dom 15:00':pp.al==='Se va antes'?'Dom ~10am':'Variable'}</td>
+      <td>${cellTxt(r.id,pp.id,'no',pp.no)}</td>
+    </tr>`).join('')
+  const omHtml=list=>list.map(pp=>`<div class="om">${avDiv(pp.n,22)}<span style="font-size:11.5px;margin-left:3px">${pp.n}</span><span class="or2">${pp.no||''}</span></div>`).join('')
+  $('aloj-antes').innerHTML=ant.length?omHtml(ant)+'<div class="al ai" style="margin-top:8px"><span>ℹ️</span>Coordinar desayuno temprano y transporte.</div>':`<div style="color:var(--t3);font-size:11px;padding:8px 0">Ningún participante se va antes.</div>`
+  $('aloj-dia').innerHTML=dia.length?omHtml(dia):`<div style="color:var(--t3);font-size:11px;padding:8px 0">Todos se quedan a dormir.</div>`
+}
+
+// ════════════════════════════════════════════════════════════════
+// ORGANIGRAMA
+// ════════════════════════════════════════════════════════════════
+const TAREAS=[
+  {t:'🍳 Cocina',c:'C45800',r:['Coordinador/a','Ayudante 1','Ayudante 2','Ayudante 3']},
+  {t:'🍽 Lavar platos',c:'6D28D9',r:['Turno mañana','Turno mediodía','Turno noche']},
+  {t:'🧹 Limpieza',c:'1D4ED8',r:['Baño mujeres','Baño hombres','Áreas comunes']},
+  {t:'🗂 Orden',c:'047857',r:['Salón principal','Habitaciones','Comedor']},
+  {t:'🎵 Alabanza',c:'BE185D',r:['Líder adoración','Músico/a','Sonido']},
+  {t:'🙏 Oración',c:'C49A2A',r:['Viernes noche','Sábado mañana','Domingo mañana']},
+  {t:'🚌 Transporte',c:'475569',r:['Conductor/a 1','Conductor/a 2']},
+  {t:'⚕️ Enfermería',c:'7A1A2E',r:['Responsable salud','Apoyo']},
+]
+
+function rOrg(){
+  const r=ret(); if(!r) return
+  const p=r.participantes
+  if(!p.length){$('org-grid').innerHTML='<div style="color:var(--t3);padding:30px;text-align:center;border:1px dashed var(--bd);border-radius:8px;grid-column:1/-1">Sin participantes — agregá participantes para generar el organigrama.</div>';return}
+  if(!orgAssign[ACTIVO_ID]) reasignar(true)
+  $('org-grid').innerHTML=TAREAS.map(t=>`
+    <div class="oc" style="border-top-color:#${t.c}">
+      <div class="oc-t" style="color:#${t.c}">${t.t}</div>
+      ${t.r.map((rol,ri)=>{
+        const pid=orgAssign[ACTIVO_ID]?.[t.t]?.[ri]
+        const pp=p.find(x=>x.id===pid)||p[0]
+        if(!pp) return ''
+        return `<div class="om">${avDiv(pp.n,22)}
+          <div style="flex:1"><select style="border:none;background:transparent;font-family:var(--s);font-size:11px;font-weight:500;width:100%;cursor:pointer;outline:none;color:var(--tx)"
+            onchange="orgAssign['${ACTIVO_ID}']['${t.t}'][${ri}]=parseInt(this.value);rOrg();save()">
+            ${p.map(x=>`<option value="${x.id}"${x.id===pid?' selected':''}>${x.n}</option>`).join('')}
+          </select></div>
+          <span class="or2">${rol}</span>
+        </div>`
+      }).join('')}
+    </div>`).join('')
+}
+
+function reasignar(silent){
+  const p=parts(); if(!p.length) return
+  const ids=[...p].sort(()=>Math.random()-.5).map(x=>x.id)
+  let idx=0
+  if(!orgAssign[ACTIVO_ID]) orgAssign[ACTIVO_ID]={}
+  TAREAS.forEach(t=>{orgAssign[ACTIVO_ID][t.t]=t.r.map(()=>ids[idx++%ids.length])})
+  if(!silent){rOrg();toast('Organigrama reasignado ✓','ok')}
+}
+
+// ════════════════════════════════════════════════════════════════
+// PROGRAMA
+// ════════════════════════════════════════════════════════════════
+// Programa base (se copia a cada retiro la primera vez)
+const PROG_BASE={
+  vie:[{h:'17:00',a:'Llegada y registro',d:'Acreditación y entrega de materiales',i:'📋'},{h:'19:00',a:'Apertura oficial',d:'Bienvenida del equipo coordinador',i:'✞'},{h:'20:00',a:'Alabanza y adoración',d:'',i:'🎵'},{h:'20:45',a:'Mensaje central',d:'Pastor Juan Díaz',i:'📖'},{h:'21:30',a:'Cena bienvenida',d:'',i:'🍽'},{h:'23:00',a:'Descanso',d:'',i:'🌙'}],
+  sab:[{h:'07:30',a:'Oración personal',d:'',i:'🙏'},{h:'08:00',a:'Desayuno',d:'',i:'☕'},{h:'09:30',a:'Taller 1',d:'Diac. María Castro',i:'✞'},{h:'13:30',a:'Almuerzo',d:'',i:'🍽'},{h:'15:00',a:'Tiempo libre',d:'',i:'⚽'},{h:'17:00',a:'Merienda',d:'',i:'🫖'},{h:'19:00',a:'Mensaje central',d:'',i:'📖'},{h:'21:00',a:'Cena',d:'',i:'🍽'},{h:'22:30',a:'Fogón espiritual',d:'',i:'🔥'}],
+  dom:[{h:'07:30',a:'Oración',d:'',i:'🙏'},{h:'08:00',a:'Desayuno',d:'',i:'☕'},{h:'09:30',a:'Culto de cierre',d:'Alabanza · Mensaje · Santa Cena',i:'✞'},{h:'11:30',a:'Consagración',d:'',i:'🙏'},{h:'13:00',a:'Almuerzo de despedida',d:'',i:'🍖'},{h:'15:00',a:'Cierre y regreso',d:'',i:'🚌'}]
+}
+const MINISTERIAL_BASE=[
+  {n:'Pastor Juan Díaz',rol:'Mensaje central',color:'C49A2A'},
+  {n:'Diac. María Castro',rol:'Taller oración',color:'1A6B4A'},
+  {n:'Hno. Luis Vera',rol:'Alabanza',color:'1B3F6E'},
+]
+
+// Obtener programa del retiro activo (crea copia si no existe)
+function getProg(d) {
+  const r=ret(); if(!r) return []
+  if(!r.prog) r.prog=JSON.parse(JSON.stringify(PROG_BASE))
+  return r.prog[d]||[]
+}
+function getMinisterial() {
+  const r=ret(); if(!r) return []
+  if(!r.ministerial) r.ministerial=JSON.parse(JSON.stringify(MINISTERIAL_BASE))
+  return r.ministerial
+}
+
+let progDia='vie'
+
+function showProg(d,btn){
+  progDia=d
+  if(btn){['pt-v','pt-s','pt-d'].forEach(id=>$(id)&&$(id).classList.remove('on'));btn.classList.add('on')}
+  const c=cs(); const bg=`#${c.xlight}`
+  const items=getProg(d)
+  $('prog-sch').innerHTML=items.map((s,i)=>`
+    <div class="si" style="background:${bg};position:relative">
+      <input value="${s.i}" style="width:28px;font-size:16px;text-align:center;border:none;background:transparent;outline:none;cursor:text;flex-shrink:0"
+        onchange="updProg('${d}',${i},'i',this.value)">
+      <div style="flex:1;min-width:0">
+        <input value="${(s.a||'').replace(/"/g,'&quot;')}" style="font-size:12px;font-weight:500;width:100%;border:none;background:transparent;outline:none;font-family:var(--s)"
+          onchange="updProg('${d}',${i},'a',this.value)"
+          onfocus="this.style.background='#fff'" onblur="this.style.background='transparent'">
+        <input value="${(s.d||'').replace(/"/g,'&quot;')}" style="font-size:10.5px;color:var(--t3);width:100%;border:none;background:transparent;outline:none;font-family:var(--s)"
+          onchange="updProg('${d}',${i},'d',this.value)"
+          onfocus="this.style.background='#fff'" onblur="this.style.background='transparent'"
+          placeholder="Detalle (opcional)">
+      </div>
+      <input value="${s.h}" style="font-family:var(--f);font-size:14px;font-weight:600;color:#${c.accent};width:52px;text-align:right;border:none;background:transparent;outline:none;flex-shrink:0"
+        onchange="updProg('${d}',${i},'h',this.value)"
+        onfocus="this.style.background='#fff'" onblur="this.style.background='transparent'">
+      <button onclick="delProgItem('${d}',${i})" style="border:none;background:none;cursor:pointer;color:var(--er);font-size:13px;padding:0 2px;flex-shrink:0;opacity:.5" title="Eliminar">✕</button>
+    </div>`).join('')
+  // Botón agregar fila
+  $('prog-sch').innerHTML+=`<button onclick="addProgItem('${d}')" class="btn bs bsm" style="width:100%;margin-top:6px;border-style:dashed">＋ Agregar actividad</button>`
+  rMinisterial()
+}
+
+function updProg(d,i,field,value){
+  const r=ret(); if(!r) return
+  if(!r.prog) r.prog=JSON.parse(JSON.stringify(PROG_BASE))
+  r.prog[d][i][field]=value
+  save()
+}
+function delProgItem(d,i){
+  const r=ret(); if(!r) return
+  if(!r.prog) r.prog=JSON.parse(JSON.stringify(PROG_BASE))
+  r.prog[d].splice(i,1)
+  showProg(d,null); save()
+  toast('Actividad eliminada','wn')
+}
+function addProgItem(d){
+  const r=ret(); if(!r) return
+  if(!r.prog) r.prog=JSON.parse(JSON.stringify(PROG_BASE))
+  r.prog[d].push({h:'00:00',a:'Nueva actividad',d:'',i:'📌'})
+  showProg(d,null); save()
+}
+
+// Equipo ministerial
+function rMinisterial(){
+  const eq=getMinisterial()
+  $('prog-ministerial').innerHTML=eq.map((m,i)=>`
+    <div class="om" style="gap:6px">
+      ${avDiv(m.n,22)}
+      <input value="${(m.n||'').replace(/"/g,'&quot;')}" style="flex:1;min-width:0;font-size:11.5px;font-weight:500;border:none;background:transparent;outline:none;font-family:var(--s)"
+        onchange="updMin(${i},'n',this.value)"
+        onfocus="this.style.background='#fff';this.style.borderRadius='4px'" onblur="this.style.background='transparent'">
+      <input value="${(m.rol||'').replace(/"/g,'&quot;')}" style="width:100px;font-size:10px;color:var(--t3);text-align:right;border:none;background:transparent;outline:none;font-family:var(--s)"
+        onchange="updMin(${i},'rol',this.value)"
+        onfocus="this.style.background='#fff'" onblur="this.style.background='transparent'">
+      <button onclick="delMin(${i})" style="border:none;background:none;cursor:pointer;color:var(--er);font-size:12px;padding:0 2px;opacity:.5" title="Dar de baja">✕</button>
+    </div>`).join('')
+}
+function updMin(i,field,value){
+  const r=ret(); if(!r) return
+  if(!r.ministerial) r.ministerial=JSON.parse(JSON.stringify(MINISTERIAL_BASE))
+  r.ministerial[i][field]=value
+  save(); rMinisterial()
+}
+function delMin(i){
+  const r=ret(); if(!r) return
+  if(!confirm('¿Dar de baja este miembro del equipo ministerial?')) return
+  if(!r.ministerial) r.ministerial=JSON.parse(JSON.stringify(MINISTERIAL_BASE))
+  r.ministerial.splice(i,1)
+  save(); rMinisterial()
+  toast('Miembro dado de baja','wn')
+}
+function addMinisterial(){
+  const r=ret(); if(!r) return
+  if(!r.ministerial) r.ministerial=JSON.parse(JSON.stringify(MINISTERIAL_BASE))
+  r.ministerial.push({n:'Nuevo integrante',rol:'Rol',color:'9C8A6E'})
+  save(); rMinisterial()
+}
+
+// ════════════════════════════════════════════════════════════════
+// ÍNDICE GENERAL
+// ════════════════════════════════════════════════════════════════
+function rIndex(){
+  const activos=RETIROS.filter(r=>r.estado==='Activo').length
+  const planif=RETIROS.filter(r=>r.estado==='Planificando').length
+  const fin=RETIROS.filter(r=>r.estado==='Finalizado').length
+  const totalParts=RETIROS.reduce((s,r)=>s+r.participantes.length,0)
+  $('index-kpis').innerHTML=[
+    {i:'✞',v:RETIROS.length,l:'Total retiros',bg:'1A1208'},
+    {i:'✅',v:activos,l:'Activos',bg:'1A6B4A'},
+    {i:'👥',v:totalParts,l:'Participantes',bg:'1B3F6E'},
+    {i:'⏳',v:planif,l:'Planificando',bg:'8B5800'},
+    {i:'📂',v:fin,l:'Finalizados',bg:'6B6678'},
+  ].map(k=>`<div class="kpi" style="background:#${k.bg}"><div class="kpi-i">${k.i}</div><div class="kpi-v">${k.v}</div><div class="kpi-l">${k.l}</div></div>`).join('')
+
+  const stBg={Activo:'1A6B4A',Planificando:'8B5800',Finalizado:'6B6678'}
+  $('index-tbody').innerHTML=RETIROS.map(r=>{
+    const p=r.participantes; const total=p.reduce((s,x)=>s+x.to,0); const cob=p.reduce((s,x)=>s+x.ab,0); const pp=pct(cob,total); const paid=p.filter(x=>x.pg==='Pagado').length
+    const genero={R1:'Jóvenes',R2:'Matrimonios',R3:'Líderes',R4:'Varones',R5:'Mujeres'}[r.id]||r.icono
+    return `<tr style="cursor:pointer" onclick="setRetiro('${r.id}');nav('dashboard')">
+      <td style="padding:9px 11px;font-size:12px;font-weight:500">${r.icono} ${r.nombre}</td>
+      <td style="padding:9px 11px;text-align:center"><span style="background:#${r.cs.med};color:#${r.cs.htxt};font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px">${genero}</span></td>
+      <td style="padding:9px 11px;text-align:center"><span style="background:#${stBg[r.estado]};color:#fff;font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px">${r.estado}</span></td>
+      <td style="padding:9px 11px;text-align:center;font-family:var(--f);font-size:14px;font-weight:600">${p.length}</td>
+      <td style="padding:9px 11px;text-align:center;font-size:11px;color:var(--t3)">${r.cupo}</td>
+      <td style="padding:9px 11px;text-align:center;color:var(--ok);font-weight:600">${paid}</td>
+      <td style="padding:9px 11px">
+        <div style="display:flex;align-items:center;gap:5px">
+          <div style="flex:1;height:5px;background:var(--cr3);border-radius:99px;overflow:hidden"><div style="height:100%;width:${pp}%;background:#${r.cs.accent};border-radius:99px"></div></div>
+          <span style="font-size:10px;font-weight:600;color:#${r.cs.accent};min-width:28px">${pp}%</span>
+        </div>
+      </td>
+      <td style="padding:9px 11px;text-align:right;font-size:11px">${fmt$(total)}</td>
+      <td style="padding:9px 11px;text-align:right;font-size:11px;color:var(--ok);font-weight:600">${fmt$(cob)}</td>
+      <td style="padding:9px 11px;text-align:right;font-size:11px;color:var(--er);font-weight:600">${fmt$(total-cob)}</td>
+      <td style="padding:9px 11px;text-align:center"><span style="font-size:10px;color:#${r.cs.accent}">Ver →</span></td>
+    </tr>`}).join('')
+}
+
+// ════════════════════════════════════════════════════════════════
+// COMPARATIVO
+// ════════════════════════════════════════════════════════════════
+function rComp(){
+  $('comp-tbody').innerHTML=RETIROS.map(r=>{
+    const p=r.participantes; const total=p.reduce((s,x)=>s+x.to,0); const cob=p.reduce((s,x)=>s+x.ab,0); const pp=pct(cob,total)
+    const stBg={Activo:'1A6B4A',Planificando:'8B5800',Finalizado:'6B6678'}
+    return `<tr style="cursor:pointer" onclick="setRetiro('${r.id}');nav('dashboard')">
+      <td style="padding:9px 11px"><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:99px;background:#${r.cs.main};flex-shrink:0"></span>${r.icono} ${r.nombre}</span></td>
+      <td style="text-align:center;padding:9px 11px"><span style="background:#${stBg[r.estado]};color:#fff;font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px">${r.estado}</span></td>
+      <td style="text-align:center;font-family:var(--f);font-size:15px;font-weight:600">${p.length}</td>
+      <td style="text-align:center;font-size:11px;color:var(--t3)">${r.cupo}</td>
+      <td style="padding:9px 11px">
+        <div style="display:flex;align-items:center;gap:5px">
+          <div style="flex:1;height:6px;background:var(--cr3);border-radius:99px;overflow:hidden"><div style="height:100%;width:${pp}%;background:#${r.cs.accent};border-radius:99px;transition:width .4s"></div></div>
+          <span style="font-size:10px;font-weight:700;color:#${r.cs.accent};min-width:30px">${pp}%</span>
+        </div>
+      </td>
+      <td style="text-align:right;font-size:11px">${fmt$(total)}</td>
+      <td style="text-align:right;color:var(--ok);font-weight:600;font-size:11px">${fmt$(cob)}</td>
+      <td style="text-align:right;color:${total-cob>0?'var(--er)':'var(--ok)'};font-weight:600;font-size:11px">${fmt$(total-cob)}</td>
+    </tr>`}).join('')
+}
+
+// ════════════════════════════════════════════════════════════════
+// ADD / DELETE PARTICIPANT
+// ════════════════════════════════════════════════════════════════
+function addPart(){
+  const n=$('np-n').value.trim(); if(!n){toast('Ingresá el nombre','wn');return}
+  const r=ret(); if(!r){toast('Sin retiro activo','wn');return}
+  const ab=parseInt($('np-ab').value)||0
+  let pg=$('np-pg').value
+  if(ab>=r.costo) pg='Pagado'; else if(ab>0) pg='Parcial'; else pg='Sin pagar'
+  r.participantes.push({id:nextId++,n,c:$('np-c').value.trim(),ig:$('np-ig').value.trim(),
+    ed:parseInt($('np-ed').value)||0,pg,ab,to:r.costo,al:$('np-al').value,
+    me:$('np-me').value.trim(),di:$('np-di').value,ae:$('np-ae').value.trim(),
+    ko:$('np-ko').value.trim(),no:$('np-no').value.trim()})
+  orgAssign[ACTIVO_ID]=null
+  closeM('m-np')
+  ;['np-n','np-c','np-ig','np-ed','np-ab','np-me','np-ae','np-ko','np-no'].forEach(id=>$(id).value='')
+  $('np-pg').selectedIndex=0;$('np-al').selectedIndex=0;$('np-di').selectedIndex=0
+  refreshAll(); save(); toast(`${n} inscripto ✓`,'ok')
+}
+
+function delPart(rid,pid){
+  if(!confirm('¿Eliminar este participante?')) return
+  const r=RETIROS.find(x=>x.id===rid)
+  r.participantes=r.participantes.filter(p=>p.id!==pid)
+  orgAssign[rid]=null; refreshAll(); save(); toast('Participante eliminado','wn')
+}
+
+// ════════════════════════════════════════════════════════════════
+// EDIT RETIRO
+// ════════════════════════════════════════════════════════════════
+function openEditRetiro(){
+  const r=ret(); if(!r) return
+  $('er-n').value=r.nombre;$('er-f').value=r.fechas;$('er-l').value=r.lugar
+  $('er-c').value=r.costo;$('er-q').value=r.cupo;$('er-v').value=r.versiculo
+  $('er-t').value=r.tema;$('er-e').value=r.estado
+  openM('m-ret')
+}
+function saveRetiro(){
+  const r=ret(); if(!r) return
+  r.nombre=$('er-n').value.trim()||r.nombre
+  r.fechas=$('er-f').value;r.lugar=$('er-l').value
+  r.costo=parseInt($('er-c').value)||r.costo;r.cupo=parseInt($('er-q').value)||r.cupo
+  r.versiculo=$('er-v').value;r.tema=$('er-t').value;r.estado=$('er-e').value
+  closeM('m-ret'); buildSidebar(); refreshAll(); save(); toast('Retiro actualizado ✓','ok')
+}
+
+// ════════════════════════════════════════════════════════════════
+// ALERT BADGE
+// ════════════════════════════════════════════════════════════════
+function updateAlertBadge(){
+  const p=parts()
+  const n=p.filter(x=>x.me).length+(p.filter(x=>x.ae||x.ko?.toLowerCase().includes('alergi')).length?1:0)+p.filter(x=>x.pg==='Sin pagar').length
+  $('alert-badge').textContent=n
+  $('alert-badge').className='badge '+(n>0?'b-er':'b-ok')
+}
+
+// ════════════════════════════════════════════════════════════════
+// EXPORT CSV
+// ════════════════════════════════════════════════════════════════
+function exportCSV(){
+  const r=ret(); if(!r) return
+  const cols=['Nombre','Celular','Iglesia','Edad','Estado Pago','Abonado','Total','Alojamiento','Medicamentos','Dieta','Condición médica','Notas']
+  const rows=r.participantes.map(p=>[p.n,p.c,p.ig,p.ed,p.pg,p.ab,p.to,p.al,p.me,p.di,p.ko,p.no].map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(','))
+  const csv=[cols.join(','),...rows].join('\n')
+  const a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv)
+  a.download=`${r.nombre.replace(/\s/g,'_')}.csv`; a.click(); toast('CSV exportado ✓','ok')
+}
+
+// ════════════════════════════════════════════════════════════════
+// COORDINADOR EDITABLE
+// ════════════════════════════════════════════════════════════════
+function editCoord(){
+  const el=$('sb-un'); const actual=el.textContent.trim()
+  const inp=document.createElement('input')
+  inp.value=actual; inp.style.cssText='background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:4px;color:#FAF7F2;font-size:11.5px;font-family:var(--s);font-weight:500;padding:3px 7px;width:130px;outline:none'
+  el.replaceWith(inp); inp.focus(); inp.select()
+  const save=()=>{const v=inp.value.trim()||actual;const n=document.createElement('div');n.className='sb-un';n.id='sb-un';n.textContent=v;inp.replaceWith(n);const av=$('sb-av');if(av)av.textContent=v[0].toUpperCase();localStorage.setItem('coordinador',v)}
+  inp.addEventListener('blur',save); inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();save()}if(e.key==='Escape'){inp.value=actual;save()}})
+}
+
+// ════════════════════════════════════════════════════════════════
+// MODALS & TOAST
+// ════════════════════════════════════════════════════════════════
+const openM=id=>$(id).classList.add('on')
+const closeM=id=>$(id).classList.remove('on')
+function toast(msg,type=''){
+  const t=document.createElement('div'); t.className='tk'+(type?' '+type:''); t.textContent=msg; $('ta').appendChild(t)
+  setTimeout(()=>{t.style.transition='all .2s';t.style.opacity='0';t.style.transform='translateX(12px)';setTimeout(()=>t.remove(),220)},2800)
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') document.querySelectorAll('.mo.on').forEach(m=>m.classList.remove('on'))
+  if(e.ctrlKey&&e.key==='n'){e.preventDefault();openM('m-np')}
+  if(e.ctrlKey&&e.key==='r'){e.preventDefault();refreshAll();toast('Actualizado ✓','ok')}
+})
+$('btn-reto').addEventListener('click',e=>{e.stopPropagation();openEditRetiro()})
+
+// ════════════════════════════════════════════════════════════════
+// LOCALSTORAGE
+// ════════════════════════════════════════════════════════════════
+function save(){
+  try{
+    localStorage.setItem('retiros_data',JSON.stringify(RETIROS))
+    localStorage.setItem('retiro_activo',ACTIVO_ID)
+    localStorage.setItem('org_assign',JSON.stringify(orgAssign))
+    const coord=$('sb-un');if(coord)localStorage.setItem('coordinador',coord.textContent.trim())
+  }catch(e){}
+}
+function load(){
+  try{
+    const d=localStorage.getItem('retiros_data')
+    const a=localStorage.getItem('retiro_activo')
+    const o=localStorage.getItem('org_assign')
+    const coord=localStorage.getItem('coordinador')
+    if(d){RETIROS=JSON.parse(d)}
+    if(a&&RETIROS.find(r=>r.id===a)) ACTIVO_ID=a
+    if(o){try{orgAssign=JSON.parse(o)}catch(e){}}
+    if(coord){
+      const el=$('sb-un');if(el){el.textContent=coord}
+      const av=$('sb-av');if(av){av.textContent=coord[0].toUpperCase()}
+    }
+    nextId=RETIROS.reduce((m,r)=>r.participantes.reduce((mx,p)=>Math.max(mx,p.id),m),9999)+1
+    return true
+  }catch(e){return false}
+}
+
+// ════════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  load()
+  applyTheme(cs())
+  buildSidebar()
+  refreshAll()
+  nav('dashboard')
 })
 </script>
 </body>
